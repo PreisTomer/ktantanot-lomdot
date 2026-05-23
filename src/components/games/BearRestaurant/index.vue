@@ -16,7 +16,7 @@
             :key="option"
             :label="option"
             :shake="option === wrongValue"
-            :disabled="isBusy || !canAnswer"
+            :disabled="isBusy"
             @pick="(value: string) => handlePick(value, submit)"
           />
         </div>
@@ -56,7 +56,6 @@ export default defineComponent({
       options: [] as number[],
       recent: [] as number[],
       wrongValue: null as string | null,
-      canAnswer: false,
       scene: null as BearScene | null,
       rng: createRng(Date.now()) as Rng
     }
@@ -79,16 +78,13 @@ export default defineComponent({
   async mounted() {
     const scene = markRaw(new BearScene())
     await scene.init(this.$refs.stage as HTMLCanvasElement)
-    scene.setRound(this.a, this.b, this.onReady)
+    scene.setRound(this.a, this.b)
     this.scene = scene
   },
   beforeUnmount() {
     this.scene?.destroy()
   },
   methods: {
-    onReady() {
-      this.canAnswer = true
-    },
     pickRound() {
       let problem = generateAddition(BEAR_MAX_SUM, this.rng)
       let guard = 0
@@ -105,12 +101,10 @@ export default defineComponent({
       if (this.recent.length > 3) this.recent.shift()
     },
     nextRound() {
-      this.canAnswer = false
       this.pickRound()
-      this.scene?.setRound(this.a, this.b, this.onReady)
+      this.scene?.setRound(this.a, this.b)
     },
     handlePick(value: string, submit: SubmitFn) {
-      if (!this.canAnswer) return
       const isCorrect = Number(value) === this.answer
       this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, `bear-${this.a}-${this.b}`, isCorrect)
       if (!isCorrect) {

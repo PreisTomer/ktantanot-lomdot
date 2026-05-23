@@ -1,7 +1,6 @@
 // Copyright © 2026 Tomer Preis. Licensed under the MIT License.
 
-import { Application, Container, Graphics, Rectangle, Text } from 'pixi.js'
-import type { FederatedPointerEvent } from 'pixi.js'
+import { Application, Graphics, Text } from 'pixi.js'
 import { DropShadowFilter } from 'pixi-filters'
 import gsap from 'gsap'
 
@@ -17,35 +16,32 @@ const DESK_BOTTOM = '#ffe2c2'
 const BANDS = 12
 const PLATE_X = BEAR_SCENE_W / 2
 const PLATE_Y = BEAR_SCENE_H * 0.72
-const PLATE_RX = 160
-const ORIGIN_A = { x: 150, y: BEAR_SCENE_H * 0.74 }
-const ORIGIN_B = { x: BEAR_SCENE_W - 150, y: BEAR_SCENE_H * 0.74 }
+const PLATE_RX = 170
+const PER_ROW = 4
+const CAKE_GAP_X = 42
+const CAKE_GAP_Y = 30
 
-interface Bunch {
-  container: Container
-  origin: { x: number; y: number }
-  rest: { x: number; y: number }
-  delivered: boolean
-}
-
-// המסעדה של הדוב scene: drag two cake bunches onto the bear's plate to combine
-// them. Same crash-safe rules (markRaw in the component, tracked tweens; the
-// bunches are rebuilt each round, never destroyed inside a GSAP callback).
+// המסעדה של הדוב scene: the two cake groups fly onto the bear's plate by
+// themselves (the first group, then the second), showing the addition; the
+// child then taps the total. No drag. Same crash-safe rules as the other
+// scenes (markRaw in the component, tracked tweens; cake slide-in tweens kill
+// themselves on completion so they can't render onto a destroyed cake later).
 export class BearScene {
   private app: Application | null = null
   private bear: Text | null = null
   private equation: Text | null = null
-  private bunches: Bunch[] = []
-  private dragTarget: Bunch | null = null
-  private readonly dragOffset = { x: 0, y: 0 }
-  private deliveredCount = 0
-  private onReady: (() => void) | null = null
+  private cakes: Text[] = []
 
   private readonly tweens = new Set<Anim>()
 
   private track(anim: Anim): Anim {
     this.tweens.add(anim)
     return anim
+  }
+
+  private endTween(anim: Anim): void {
+    this.tweens.delete(anim)
+    anim.kill()
   }
 
   async init(canvas: HTMLCanvasElement): Promise<void> {
@@ -61,11 +57,6 @@ export class BearScene {
     })
     this.app = app
     this.buildBackdrop()
-    app.stage.eventMode = 'static'
-    app.stage.hitArea = new Rectangle(0, 0, BEAR_SCENE_W, BEAR_SCENE_H)
-    app.stage.on('pointermove', (event) => this.onDragMove(event))
-    app.stage.on('pointerup', () => this.onDragEnd())
-    app.stage.on('pointerupoutside', () => this.onDragEnd())
   }
 
   private buildBackdrop(): void {
@@ -77,8 +68,6 @@ export class BearScene {
       desk.rect(0, i * bandHeight, BEAR_SCENE_W, bandHeight + 1).fill({ color })
     }
     this.app.stage.addChild(desk)
-
-    // Counter the bear stands behind.
     this.app.stage.addChild(
       new Graphics().roundRect(0, BEAR_SCENE_H * 0.5, BEAR_SCENE_W, BEAR_SCENE_H * 0.5, 0).fill({ color: SCENE.carEmpty })
     )
@@ -96,84 +85,53 @@ export class BearScene {
     this.app.stage.addChild(equation)
     this.equation = equation
 
-    // The plate (drop target).
     const plate = new Graphics()
-    plate.ellipse(PLATE_X, PLATE_Y, PLATE_RX, 58).fill({ color: SCENE.white })
-    plate.ellipse(PLATE_X, PLATE_Y, PLATE_RX - 16, 46).fill({ color: SCENE.trainWindow })
+    plate.ellipse(PLATE_X, PLATE_Y, PLATE_RX, 60).fill({ color: SCENE.white })
+    plate.ellipse(PLATE_X, PLATE_Y, PLATE_RX - 16, 48).fill({ color: SCENE.trainWindow })
     this.app.stage.addChild(plate)
   }
 
-  setRound(a: number, b: number, onReady: () => void): void {
-    this.onReady = onReady
-    this.deliveredCount = 0
-    this.dragTarget = null
-    for (const bunch of this.bunches) bunch.container.destroy()
-    this.bunches = []
+  setRound(a: number, b: number): void {
+    for (const cake of this.cakes) cake.destroy()
+    this.cakes = []
     if (this.equation) this.equation.text = `${a} + ${b} = ?`
+    if (!this.app) return
 
-    this.bunches.push(this.buildBunch(a, ORIGIN_A, { x: PLATE_X - 64, y: PLATE_Y - 16 }))
-    this.bunches.push(this.buildBunch(b, ORIGIN_B, { x: PLATE_X + 64, y: PLATE_Y - 16 }))
-  }
-
-  private buildBunch(count: number, origin: { x: number; y: number }, rest: { x: number; y: number }): Bunch {
-    if (!this.app) {
-      return { container: new Container(), origin, rest, delivered: false }
-    }
-    const container = new Container()
-    const perRow = 3
-    for (let i = 0; i < count; i++) {
+    const total = a + b
+    const positions = this.platePositions(total)
+    positions.forEach((target, index) => {
+      const fromLeft = index < a
       const cake = new Text({ text: '🧁', style: { fontFamily: FONT, fontSize: 40 } })
       cake.anchor.set(0.5)
-      const col = i % perRow
-      const row = Math.floor(i / perRow)
-      cake.position.set((col - (Math.min(count, perRow) - 1) / 2) * 38, -row * 36)
-      container.addChild(cake)
+      cake.position.set(fromLeft ? -60 : BEAR_SCENE_W + 60, target.y)
+      this.app?.stage.addChild(cake)
+      this.cakes.push(cake)
+      // Group A flies in first, then group B, so the combining reads clearly.
+      const order = fromLeft ? index : index - a
+      const delay = (fromLeft ? 0 : a * 0.12 + 0.35) + order * 0.12
+      const tween: Anim = gsap.to(cake, {
+        x: target.x,
+        duration: 0.45,
+        delay,
+        ease: 'back.out(1.4)',
+        onComplete: () => this.endTween(tween)
+      })
+      this.track(tween)
+    })
+  }
+
+  private platePositions(total: number): { x: number; y: number }[] {
+    const rows = Math.ceil(total / PER_ROW)
+    const positions: { x: number; y: number }[] = []
+    for (let i = 0; i < total; i++) {
+      const row = Math.floor(i / PER_ROW)
+      const colCount = Math.min(PER_ROW, total - row * PER_ROW)
+      const col = i % PER_ROW
+      const x = PLATE_X + (col - (colCount - 1) / 2) * CAKE_GAP_X
+      const y = PLATE_Y - 6 - (rows - 1 - row) * CAKE_GAP_Y
+      positions.push({ x, y })
     }
-    container.position.set(origin.x, origin.y)
-    container.filters = [new DropShadowFilter({ alpha: 0.25, blur: 2 })]
-    container.eventMode = 'static'
-    container.cursor = 'grab'
-    const bunch: Bunch = { container, origin, rest, delivered: false }
-    container.on('pointerdown', (event) => this.onDragStart(bunch, event))
-    this.app.stage.addChild(container)
-    return bunch
-  }
-
-  private onDragStart(bunch: Bunch, event: FederatedPointerEvent): void {
-    if (bunch.delivered) return
-    this.dragTarget = bunch
-    this.dragOffset.x = bunch.container.x - event.global.x
-    this.dragOffset.y = bunch.container.y - event.global.y
-    this.app?.stage.addChild(bunch.container) // bring to front
-  }
-
-  private onDragMove(event: FederatedPointerEvent): void {
-    if (!this.dragTarget) return
-    this.dragTarget.container.position.set(event.global.x + this.dragOffset.x, event.global.y + this.dragOffset.y)
-  }
-
-  private onDragEnd(): void {
-    const bunch = this.dragTarget
-    this.dragTarget = null
-    if (!bunch) return
-    const dx = bunch.container.x - PLATE_X
-    const dy = bunch.container.y - PLATE_Y
-    if (Math.abs(dx) <= PLATE_RX && Math.abs(dy) <= 120) {
-      this.deliver(bunch)
-    } else {
-      this.track(gsap.to(bunch.container, { x: bunch.origin.x, y: bunch.origin.y, duration: 0.3, ease: 'power2.out' }))
-    }
-  }
-
-  private deliver(bunch: Bunch): void {
-    bunch.delivered = true
-    bunch.container.eventMode = 'none'
-    bunch.container.cursor = 'default'
-    this.track(gsap.to(bunch.container, { x: bunch.rest.x, y: bunch.rest.y, duration: 0.3, ease: 'back.out(1.6)' }))
-    this.deliveredCount += 1
-    if (this.deliveredCount === this.bunches.length) {
-      this.onReady?.()
-    }
+    return positions
   }
 
   cheer(): void {
@@ -184,11 +142,9 @@ export class BearScene {
   destroy(): void {
     this.tweens.forEach((anim) => anim.kill())
     this.tweens.clear()
-    this.bunches = []
-    this.dragTarget = null
+    this.cakes = []
     this.bear = null
     this.equation = null
-    this.onReady = null
     if (this.app) {
       try {
         this.app.destroy(true, { children: true, texture: true })
