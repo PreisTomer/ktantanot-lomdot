@@ -70,11 +70,10 @@ export default defineComponent({
       const grid = this.$refs.grid as HTMLElement | undefined
       if (!grid) return
       gsap.from(grid.children, {
-        y: 36,
+        y: 40,
         opacity: 0,
-        scale: 0.82,
         duration: 0.45,
-        ease: 'back.out(1.7)',
+        ease: 'power3.out',
         stagger: 0.07
       })
     },

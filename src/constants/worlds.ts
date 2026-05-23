@@ -6,7 +6,7 @@ import type { GameId } from '@/constants/strings'
 import type { WorldDef } from '@/types/world'
 
 // Games that are fully playable; the rest show a "coming soon" screen.
-export const READY_GAMES: ReadonlySet<GameId> = new Set([GAME_ID.SYLLABLE_TRAIN])
+export const READY_GAMES: ReadonlySet<GameId> = new Set([GAME_ID.SYLLABLE_TRAIN, GAME_ID.CATCH_WORD])
 
 // Array order is DOM order; under RTL the first entry sits on the right,
 // so reading flows right-to-left as required.

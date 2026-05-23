@@ -13,6 +13,11 @@ export const SYLLABLE_ROUNDS = 6
 export const TRAIN_SCENE_W = 900
 export const TRAIN_SCENE_H = 460
 export const TRAIN_CAR = 96
+
+export const CATCH_ROUNDS = 6
+export const CATCH_BALLOONS = 4
+export const CATCH_SCENE_W = 900
+export const CATCH_SCENE_H = 580
 export const REWARD_DURATION_MS = 1500
 export const WRONG_FEEDBACK_MS = 600
 export const COUNT_MAX = 10

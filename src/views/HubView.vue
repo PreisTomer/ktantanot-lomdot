@@ -49,11 +49,10 @@ export default defineComponent({
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
       const cards = (this.$refs.grid as HTMLElement).children
       gsap.from(cards, {
-        y: 40,
+        y: 48,
         opacity: 0,
-        scale: 0.8,
         duration: 0.5,
-        ease: 'back.out(1.7)',
+        ease: 'power3.out',
         stagger: 0.08
       })
     },

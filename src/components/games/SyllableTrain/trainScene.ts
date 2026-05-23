@@ -5,6 +5,7 @@ import { DropShadowFilter, GlowFilter } from 'pixi-filters'
 import gsap from 'gsap'
 
 import { SCENE } from '@/theme/colors'
+import { lerpColor } from '@/utils/color'
 import { TRAIN_CAR, TRAIN_SCENE_H, TRAIN_SCENE_W } from '@/constants/gameConfig'
 import type { WordCard } from '@/constants/words'
 
@@ -12,21 +13,6 @@ const FONT = 'Varela Round, Rubik, sans-serif'
 const SKY_BANDS = 12
 const TRACK_INSET = 95
 const WHEEL_RADIUS = 16
-
-function lerpColor(from: string, to: string, t: number): string {
-  const a = parseInt(from.slice(1), 16)
-  const b = parseInt(to.slice(1), 16)
-  const ar = (a >> 16) & 255
-  const ag = (a >> 8) & 255
-  const ab = a & 255
-  const br = (b >> 16) & 255
-  const bg = (b >> 8) & 255
-  const bb = b & 255
-  const r = Math.round(ar + (br - ar) * t)
-  const g = Math.round(ag + (bg - ag) * t)
-  const bl = Math.round(ab + (bb - ab) * t)
-  return `#${((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1)}`
-}
 
 // Encapsulates the WebGL train scene: backdrop, the assembling train, steam,
 // and the reward picture. The Vue component drives it; no Vue imports here.

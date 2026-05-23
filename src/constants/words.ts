@@ -8,6 +8,12 @@ export interface WordCard {
   options: [string, string, string]
 }
 
+// Short, common, readable words for whole-word recognition (catch the word).
+export const CATCH_WORDS: string[] = [
+  'אמא', 'אבא', 'בית', 'כלב', 'חתול', 'שמש', 'דג', 'כדור',
+  'פרח', 'עץ', 'מים', 'ילד', 'ילדה', 'יד', 'פה', 'אש'
+]
+
 // Three-letter words with a missing middle letter, each with a clear picture.
 export const SYLLABLE_WORDS: WordCard[] = [
   { word: 'בית', picture: '🏠', missingIndex: 1, options: ['י', 'ו', 'ה'] },

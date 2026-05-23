@@ -19,11 +19,39 @@ import { defineComponent } from 'vue'
 
 import { ICON } from '@/constants/icons'
 
+// Per-orb parallax depth (px of travel across the full viewport).
+const ORB_DEPTH = [26, 40, 18, 52]
+
 export default defineComponent({
   name: 'AnimatedBackground',
+  data() {
+    return {
+      orbs: [] as HTMLElement[],
+      pointerHandler: null as ((event: PointerEvent) => void) | null
+    }
+  },
   computed: {
     icon() {
       return ICON
+    }
+  },
+  mounted() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    this.orbs = Array.from(this.$el.querySelectorAll('.bg__orb'))
+    this.pointerHandler = (event: PointerEvent) => this.applyParallax(event)
+    window.addEventListener('pointermove', this.pointerHandler, { passive: true })
+  },
+  beforeUnmount() {
+    if (this.pointerHandler) window.removeEventListener('pointermove', this.pointerHandler)
+  },
+  methods: {
+    applyParallax(event: PointerEvent) {
+      const nx = event.clientX / window.innerWidth - 0.5
+      const ny = event.clientY / window.innerHeight - 0.5
+      this.orbs.forEach((orb, index) => {
+        const depth = ORB_DEPTH[index % ORB_DEPTH.length]
+        orb.style.translate = `${(-nx * depth).toFixed(1)}px ${(-ny * depth).toFixed(1)}px`
+      })
     }
   }
 })

@@ -8,6 +8,7 @@ import { defineComponent } from 'vue'
 import type { Component } from 'vue'
 
 import SyllableTrainGame from '@/components/games/SyllableTrain/index.vue'
+import CatchWordGame from '@/components/games/CatchWord/index.vue'
 import ComingSoonGame from '@/components/games/ComingSoonGame.vue'
 
 import { GAME_ID, ROUTE } from '@/constants/strings'
@@ -24,7 +25,7 @@ function comingSoon(id: GameId): GameEntry {
 
 const REGISTRY: Record<GameId, GameEntry> = {
   [GAME_ID.SYLLABLE_TRAIN]: { is: SyllableTrainGame, props: {} },
-  [GAME_ID.CATCH_WORD]: comingSoon(GAME_ID.CATCH_WORD),
+  [GAME_ID.CATCH_WORD]: { is: CatchWordGame, props: {} },
   [GAME_ID.SOUND_DETECTIVE]: comingSoon(GAME_ID.SOUND_DETECTIVE),
   [GAME_ID.MAGIC_BOOK]: comingSoon(GAME_ID.MAGIC_BOOK),
   [GAME_ID.BEAR_RESTAURANT]: comingSoon(GAME_ID.BEAR_RESTAURANT),
