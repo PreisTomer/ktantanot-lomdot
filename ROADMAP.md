@@ -11,11 +11,11 @@ playable; the rest show `ComingSoonGame` with a "בקרוב" badge.
 
 - [x] **רכבת ההברות** — syllable train: complete the missing letter of a word
 - [x] **תפסי את המילה** — catch the word: pop the balloon matching the picture/word
+- [x] **הבלשית שמחפשת צליל** — find the word that starts with the target letter
 
 ## Remaining
 
 ### קריאה (reading)
-- [ ] **הבלשית שמחפשת צליל** — find a word that starts with a given sound
 - [ ] **ספר הקסם** — interactive story; tapping a word animates its meaning
 
 ### חשבון (math)
