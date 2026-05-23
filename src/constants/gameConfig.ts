@@ -18,6 +18,11 @@ export const CATCH_ROUNDS = 6
 export const CATCH_BALLOONS = 4
 export const CATCH_SCENE_W = 900
 export const CATCH_SCENE_H = 580
+
+export const DETECTIVE_ROUNDS = 6
+export const DETECTIVE_OPTIONS = 4
+export const DETECTIVE_SCENE_W = 900
+export const DETECTIVE_SCENE_H = 560
 export const REWARD_DURATION_MS = 1500
 export const WRONG_FEEDBACK_MS = 600
 export const COUNT_MAX = 10

@@ -22,6 +22,14 @@
   50%  { opacity: 1;   transform: scale(1.1); }
 }
 
+@keyframes rise {
+  0%   { opacity: 0;    transform: translate(0, 0) scale(0.6); }
+  12%  { opacity: 0.5; }
+  50%  { transform: translate(20px, -52vh) scale(1); }
+  88%  { opacity: 0.42; }
+  100% { opacity: 0;    transform: translate(0, -104vh) scale(1.15); }
+}
+
 @keyframes pulse {
   0%,
   100% { transform: scale(1); }

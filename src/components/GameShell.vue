@@ -2,14 +2,24 @@
 <template>
   <section class="shell">
     <GameHeader :title="title" :prompt="prompt" :parts="speechParts" />
-    <ProgressDots class="shell__dots" :total="rounds" :current="current - 1" />
+    <ProgressDots class="shell__dots" :total="rounds" :current="completedRounds" />
 
     <div v-if="isFinished" class="shell__finish">
       <p class="shell__finish-text">{{ $t('games.finished') }}</p>
-      <button class="shell__again" type="button" @click="replay">
-        <span class="shell__again-icon">{{ icon.STAR }}</span>
-        <span>{{ $t('games.playAgain') }}</span>
-      </button>
+      <div class="shell__actions">
+        <button class="shell__action shell__action--again" type="button" @click="replay">
+          <span class="shell__action-icon">{{ icon.STAR }}</span>
+          <span>{{ $t('games.playAgain') }}</span>
+        </button>
+        <button class="shell__action" type="button" @click="goToWorld">
+          <span class="shell__action-icon">{{ worldIcon }}</span>
+          <span>{{ $t('games.anotherGame') }}</span>
+        </button>
+        <button class="shell__action" type="button" @click="goToHub">
+          <span class="shell__action-icon">{{ icon.HOME }}</span>
+          <span>{{ $t('games.anotherWorld') }}</span>
+        </button>
+      </div>
     </div>
 
     <div v-else class="shell__body">
@@ -33,6 +43,9 @@ import RewardOverlay from '@/components/RewardOverlay/index.vue'
 import { ICON } from '@/constants/icons'
 import { PHRASE } from '@/constants/phrases'
 import { REWARD_DURATION_MS } from '@/constants/gameConfig'
+import { ROUTE } from '@/constants/strings'
+import type { GameId } from '@/constants/strings'
+import { findWorldForGame } from '@/constants/worlds'
 
 const PRAISE = [PHRASE.amazing, PHRASE.wellDone, PHRASE.superStar]
 
@@ -70,6 +83,15 @@ export default defineComponent({
   computed: {
     icon() {
       return ICON
+    },
+    completedRounds(): number {
+      return this.isFinished ? this.rounds : this.current - 1
+    },
+    worldId(): string | undefined {
+      return findWorldForGame(this.$route.params.gameId as GameId)?.id
+    },
+    worldIcon(): string {
+      return findWorldForGame(this.$route.params.gameId as GameId)?.icon ?? ICON.STAR
     },
     announceKey(): string {
       return this.speechParts.length > 0 ? this.speechParts.join('|') : this.prompt
@@ -125,6 +147,16 @@ export default defineComponent({
       this.current = 1
       this.isFinished = false
       this.$emit('next')
+    },
+    goToWorld() {
+      if (this.worldId) {
+        this.$router.push({ name: ROUTE.WORLD, params: { worldId: this.worldId } })
+        return
+      }
+      this.goToHub()
+    },
+    goToHub() {
+      this.$router.push({ name: ROUTE.HUB })
     }
   }
 })
@@ -159,15 +191,28 @@ export default defineComponent({
     color: var(--color-ink);
   }
 
-  &__again {
-    @include flex-center;
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-md);
+  }
+
+  &__action {
+    @include flex-column-center;
     @include pressable;
-    gap: var(--sp-sm);
+    gap: var(--sp-xs);
+    min-inline-size: 9rem;
     padding: var(--sp-md) var(--sp-lg);
-    font-size: var(--fs-md);
+    font-size: var(--fs-sm);
     font-weight: 700;
-    color: var(--color-white);
-    background: var(--color-primary);
+    color: var(--color-ink);
+    background: var(--color-surface);
+
+    &--again {
+      color: var(--color-white);
+      background: var(--color-primary);
+    }
 
     &-icon {
       font-size: var(--fs-lg);
