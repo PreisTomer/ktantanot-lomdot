@@ -15,7 +15,7 @@
             v-for="option in options"
             :key="option"
             class="train__choice"
-            :class="{ 'train__choice--shake': option === wrongValue }"
+            :class="{ 'train__choice--wrong': option === wrongValue }"
             type="button"
             :disabled="isBusy || isAnimating"
             @click="pick(option, submit)"
@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, markRaw } from 'vue'
 import { mapStores } from 'pinia'
 
 import { useProgressStore } from '@/stores/progressStore'
@@ -59,6 +59,7 @@ export default defineComponent({
       options: [] as string[],
       wrongValue: null as string | null,
       isAnimating: false,
+      recent: [] as string[],
       scene: null as TrainScene | null,
       rng: createRng(Date.now()) as Rng
     }
@@ -79,7 +80,9 @@ export default defineComponent({
     this.pickCard()
   },
   async mounted() {
-    const scene = new TrainScene()
+    // markRaw is essential: without it Vue makes the whole Pixi object tree
+    // reactive, and GSAP tweening the proxies corrupts Pixi and crashes.
+    const scene = markRaw(new TrainScene())
     await scene.init(this.$refs.stage as HTMLCanvasElement)
     scene.setWord(this.card)
     this.scene = scene
@@ -91,7 +94,9 @@ export default defineComponent({
     pickCard() {
       const ids = SYLLABLE_WORDS.map((word) => word.word)
       const stats = this.progressStore.byProfile[DEFAULT_PROFILE_ID]?.items ?? {}
-      const targetWord = pickNextItem(ids, stats, this.rng)
+      const targetWord = pickNextItem(ids, stats, this.rng, this.recent)
+      this.recent.push(targetWord)
+      if (this.recent.length > ids.length - 1) this.recent.shift()
       this.card = SYLLABLE_WORDS.find((word) => word.word === targetWord) ?? SYLLABLE_WORDS[0]
       this.options = shuffle(this.card.options, this.rng)
       this.wrongValue = null
@@ -114,10 +119,9 @@ export default defineComponent({
       }
       this.isAnimating = true
       await this.scene?.fillLetter(letter)
-      await this.scene?.chug()
-      this.scene?.showPicture(this.card.picture)
       this.isAnimating = false
       submit(true)
+      this.scene?.celebrate(this.card.picture)
     }
   }
 })
@@ -155,9 +159,12 @@ export default defineComponent({
     font-weight: 700;
     color: var(--color-ink);
     background: var(--color-surface);
+    transition: background var(--tr-fast), color var(--tr-fast);
 
-    &--shake {
-      animation: wiggle 0.4s ease both;
+    &--wrong {
+      color: var(--color-white);
+      background: var(--color-retry);
+      animation: wiggle 0.45s ease both;
     }
 
     &:disabled {

@@ -8,10 +8,28 @@ export interface WordCard {
   options: [string, string, string]
 }
 
-// Short, common, readable words for whole-word recognition (catch the word).
-export const CATCH_WORDS: string[] = [
-  'אמא', 'אבא', 'בית', 'כלב', 'חתול', 'שמש', 'דג', 'כדור',
-  'פרח', 'עץ', 'מים', 'ילד', 'ילדה', 'יד', 'פה', 'אש'
+export interface PictureWord {
+  word: string
+  picture: string
+}
+
+// Picturable words for whole-word recognition: the child sees a picture and
+// pops the balloon whose word matches it (catch the word).
+export const PICTURE_WORDS: PictureWord[] = [
+  { word: 'שמש', picture: '☀️' },
+  { word: 'בית', picture: '🏠' },
+  { word: 'כלב', picture: '🐶' },
+  { word: 'חתול', picture: '🐱' },
+  { word: 'דג', picture: '🐟' },
+  { word: 'פרח', picture: '🌸' },
+  { word: 'עץ', picture: '🌳' },
+  { word: 'כדור', picture: '⚽' },
+  { word: 'פיל', picture: '🐘' },
+  { word: 'דוב', picture: '🐻' },
+  { word: 'סוס', picture: '🐴' },
+  { word: 'פרה', picture: '🐮' },
+  { word: 'ירח', picture: '🌙' },
+  { word: 'עוגה', picture: '🍰' }
 ]
 
 // Three-letter words with a missing middle letter, each with a clear picture.

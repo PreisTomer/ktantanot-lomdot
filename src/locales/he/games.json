@@ -5,7 +5,7 @@
       "prompt": "איזו אות חסרה במילה?",
       "instruction": "איזו אות חסרה כדי שהרכבת תיסע?"
     },
-    "catchWord": { "title": "תפסי את המילה", "prompt": "תפסי את המילה {word}", "instruction": "תפסי את המילה" },
+    "catchWord": { "title": "תפסי את המילה", "prompt": "תפסי את המילה {word}", "instruction": "תפסי את המילה", "cue": "תפסי את:" },
     "soundDetective": { "title": "הבלשית" },
     "magicBook": { "title": "ספר הקסם" },
     "bearRestaurant": { "title": "המסעדה של הדוב" },

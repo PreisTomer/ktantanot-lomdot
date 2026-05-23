@@ -22,6 +22,19 @@ describe('pickNextItem', () => {
     expect(pickNextItem(['x', 'y'], { x: stat(2, 2) }, createRng(2))).toBe('y')
   })
 
+  it('never returns an excluded id when other candidates exist', () => {
+    const stats = { a: stat(3, 3), b: stat(3, 3), c: stat(3, 3) }
+    for (let seed = 0; seed < 50; seed++) {
+      const pick = pickNextItem(['a', 'b', 'c'], stats, createRng(seed), ['a'])
+      expect(pick).not.toBe('a')
+    }
+  })
+
+  it('falls back to all ids when every candidate is excluded', () => {
+    const pick = pickNextItem(['a', 'b'], {}, createRng(1), ['a', 'b'])
+    expect(['a', 'b']).toContain(pick)
+  })
+
   it('resurfaces the weakest item most often once all are seen', () => {
     const stats = { strong: stat(10, 10), weak: stat(10, 1) }
     const counts = { strong: 0, weak: 0 }

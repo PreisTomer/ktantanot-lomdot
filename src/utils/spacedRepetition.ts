@@ -10,27 +10,33 @@ import type { ItemStat } from '@/types/progress'
  * @param allIds - every practisable item id
  * @param stats - per-item history (missing entry means unseen)
  * @param rng - injected randomness source (seed it in tests)
+ * @param exclude - recently-used ids to avoid repeating (ignored if it would
+ *   leave no candidates)
  */
 export function pickNextItem(
   allIds: readonly string[],
   stats: Record<string, ItemStat>,
-  rng: Rng
+  rng: Rng,
+  exclude: readonly string[] = []
 ): string {
   if (allIds.length === 0) {
     throw new Error('pickNextItem requires at least one item')
   }
 
-  const unseen = allIds.filter((id) => !stats[id] || stats[id].seen === 0)
+  const filtered = allIds.filter((id) => !exclude.includes(id))
+  const pool = filtered.length > 0 ? filtered : allIds
+
+  const unseen = pool.filter((id) => !stats[id] || stats[id].seen === 0)
   if (unseen.length > 0) {
     return unseen[Math.floor(rng() * unseen.length)]
   }
 
-  const weights = allIds.map((id) => {
+  const weights = pool.map((id) => {
     const stat = stats[id]
     const accuracy = stat.correct / stat.seen
     return 1 - accuracy + MASTERY_WEIGHT_FLOOR
   })
-  return pickWeighted(allIds, weights, rng)
+  return pickWeighted(pool, weights, rng)
 }
 
 function pickWeighted(ids: readonly string[], weights: number[], rng: Rng): string {

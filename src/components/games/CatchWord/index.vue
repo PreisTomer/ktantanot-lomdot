@@ -3,19 +3,23 @@
   <GameShell
     ref="shell"
     :title="$t('games.catchWord.title')"
-    :prompt="$t('games.catchWord.prompt', { word: target })"
+    :prompt="$t('games.catchWord.prompt', { word: target.word })"
     :speech-parts="speechParts"
     :rounds="rounds"
     @next="nextRound"
   >
     <div class="catch">
+      <div class="catch__cue">
+        <span class="catch__cue-label">{{ $t('games.catchWord.cue') }}</span>
+        <span class="catch__cue-picture">{{ target.picture }}</span>
+      </div>
       <canvas ref="stage" class="catch__stage"></canvas>
     </div>
   </GameShell>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, markRaw } from 'vue'
 import { mapStores } from 'pinia'
 
 import { useProgressStore } from '@/stores/progressStore'
@@ -28,18 +32,22 @@ import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
 
 import { CATCH_BALLOONS, CATCH_ROUNDS } from '@/constants/gameConfig'
-import { CATCH_WORDS } from '@/constants/words'
+import { PICTURE_WORDS } from '@/constants/words'
+import type { PictureWord } from '@/constants/words'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { BalloonScene } from './balloonScene'
+
+const WORD_POOL = PICTURE_WORDS.map((entry) => entry.word)
 
 export default defineComponent({
   name: 'CatchWordGame',
   components: { GameShell },
   data() {
     return {
-      target: CATCH_WORDS[0],
+      target: PICTURE_WORDS[0] as PictureWord,
       isAnimating: false,
+      recent: [] as string[],
       scene: null as BalloonScene | null,
       rng: createRng(Date.now()) as Rng
     }
@@ -50,14 +58,16 @@ export default defineComponent({
       return CATCH_ROUNDS
     },
     speechParts(): string[] {
-      return [this.$t('games.catchWord.instruction'), this.target]
+      return [this.$t('games.catchWord.instruction'), this.target.word]
     }
   },
   created() {
     this.pickTarget()
   },
   async mounted() {
-    const scene = new BalloonScene()
+    // markRaw is essential: without it Vue makes the whole Pixi object tree
+    // reactive, and GSAP tweening the proxies corrupts Pixi and crashes.
+    const scene = markRaw(new BalloonScene())
     await scene.init(this.$refs.stage as HTMLCanvasElement)
     scene.setRound(this.roundWords(), this.handleTap)
     this.scene = scene
@@ -68,10 +78,13 @@ export default defineComponent({
   methods: {
     pickTarget() {
       const stats = this.progressStore.byProfile[DEFAULT_PROFILE_ID]?.items ?? {}
-      this.target = pickNextItem(CATCH_WORDS, stats, this.rng)
+      const word = pickNextItem(WORD_POOL, stats, this.rng, this.recent)
+      this.recent.push(word)
+      if (this.recent.length > WORD_POOL.length - 1) this.recent.shift()
+      this.target = PICTURE_WORDS.find((entry) => entry.word === word) ?? PICTURE_WORDS[0]
     },
     roundWords(): string[] {
-      return buildChoices(this.target, CATCH_WORDS, CATCH_BALLOONS, this.rng)
+      return buildChoices(this.target.word, WORD_POOL, CATCH_BALLOONS, this.rng)
     },
     nextRound() {
       this.pickTarget()
@@ -82,10 +95,10 @@ export default defineComponent({
       if (this.isAnimating) return
       const shell = this.$refs.shell as InstanceType<typeof GameShell> | undefined
       if (!shell) return
-      const isCorrect = word === this.target
-      this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, this.target, isCorrect)
+      const isCorrect = word === this.target.word
+      this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, this.target.word, isCorrect)
       if (!isCorrect) {
-        this.scene?.wobble(word)
+        this.scene?.floatAway(word)
         shell.submit(false)
         return
       }
@@ -98,8 +111,33 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/mixins' as *;
+
 .catch {
+  @include flex-column-center;
+  gap: var(--sp-md);
   inline-size: 100%;
+
+  &__cue {
+    @include flex-center;
+    gap: var(--sp-md);
+    padding: var(--sp-sm) var(--sp-lg);
+    background: var(--color-surface);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-soft);
+
+    &-label {
+      font-size: var(--fs-sm);
+      font-weight: 700;
+      color: var(--color-ink-soft);
+    }
+
+    &-picture {
+      font-size: var(--fs-xl);
+      line-height: 1;
+      @include ambient(pulse, 2.4s);
+    }
+  }
 
   &__stage {
     inline-size: 100%;
