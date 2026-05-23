@@ -48,6 +48,11 @@ class AudioService {
   stop(): void {
     this.synth?.cancel()
   }
+
+  isSpeaking(): boolean {
+    const synth = this.synth
+    return !!synth && (synth.speaking || synth.pending)
+  }
 }
 
 export const audio = new AudioService()

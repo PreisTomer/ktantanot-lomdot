@@ -5,14 +5,15 @@ export interface Phrase {
   audioFile?: string
 }
 
-// Spoken praise / feedback. Feminine address throughout (the players are girls).
-// audioFile may later point to a recorded clip; until then the text is spoken via TTS.
+// Spoken praise / feedback. Gender-neutral: no second-person gendered verbs, so
+// it fits every child (see strings.md). audioFile may later point to a recorded
+// clip; until then the text is spoken via TTS.
 export const PHRASE = {
-  amazing: { text: 'מדהים! הצלחת!' },
+  amazing: { text: 'וואו! הצלחת!' },
   wellDone: { text: 'כל הכבוד!' },
-  superStar: { text: 'את כוכבת!' },
-  almost: { text: 'כמעט, נסי שוב' },
-  tryAgain: { text: 'נסי עוד פעם, את יכולה' },
+  superStar: { text: 'איזה כוכב!' },
+  almost: { text: 'כמעט! ננסה שוב' },
+  tryAgain: { text: 'עוד פעם, ביחד נצליח!' },
   comingSoon: { text: 'עוד רגע, בקרוב נשחק בזה!' }
 } as const satisfies Record<string, Phrase>
 

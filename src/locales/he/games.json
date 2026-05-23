@@ -5,8 +5,8 @@
       "prompt": "איזו אות חסרה במילה?",
       "instruction": "איזו אות חסרה כדי שהרכבת תיסע?"
     },
-    "catchWord": { "title": "תפסי את המילה", "prompt": "תפסי את המילה {word}", "instruction": "תפסי את המילה", "cue": "תפסי את:" },
-    "soundDetective": { "title": "הבלשית", "prompt": "מצאי מילה שמתחילה באות {letter}", "instruction": "איזו מילה מתחילה באות" },
+    "catchWord": { "title": "לתפוס את המילה", "prompt": "לתפוס את המילה {word}", "instruction": "לתפוס את המילה", "cue": "לתפוס את:" },
+    "soundDetective": { "title": "הבלשית", "prompt": "למצוא מילה שמתחילה באות {letter}", "instruction": "איזו מילה מתחילה באות" },
     "magicBook": { "title": "ספר הקסם" },
     "bearRestaurant": { "title": "המסעדה של הדוב" },
     "thiefMonkey": { "title": "הקוף הגנב", "prompt": "כמה בננות נשארו?", "story": "הקוף הגנב לקח {stolen} בננות מהעץ" },
@@ -20,7 +20,7 @@
     "sistersMission": { "title": "משימת האחיות" },
     "comingSoon": "המשחק הזה כמעט מוכן, בקרוב נשחק בו!",
     "soonBadge": "בקרוב",
-    "finished": "כל הכבוד! סיימת את כל המשחק!",
+    "finished": "כל הכבוד! סיימנו את כל המשחק!",
     "playAgain": "עוד פעם",
     "anotherGame": "משחק אחר",
     "anotherWorld": "עולם אחר"

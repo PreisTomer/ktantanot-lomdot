@@ -28,6 +28,8 @@ export class MonkeyScene {
   private bananas: Text[] = []
   private monkey: Text | null = null
   private equation: Text | null = null
+  private cover: Container | null = null
+  private coverTween: Anim | null = null
 
   private readonly tweens = new Set<Anim>()
   private spent: Container[] = []
@@ -107,6 +109,22 @@ export class MonkeyScene {
     equation.position.set(MONKEY_SCENE_W / 2, MONKEY_SCENE_H - 44)
     this.app.stage.addChild(equation)
     this.equation = equation
+
+    // Leafy cover that hides the remaining bananas so the child must subtract
+    // rather than count what is left.
+    const cover = new Container()
+    cover.addChild(new Graphics().ellipse(0, 0, 180, 120).fill({ color: SCENE.hillNear }))
+    cover.addChild(new Graphics().ellipse(-92, 18, 92, 72).fill({ color: SCENE.hillFar }))
+    cover.addChild(new Graphics().ellipse(92, 18, 92, 72).fill({ color: SCENE.hillFar }))
+    const question = new Text({ text: '?', style: { fontFamily: FONT, fontSize: 104, fontWeight: '700', fill: '#ffffff' } })
+    question.anchor.set(0.5)
+    cover.addChild(question)
+    cover.position.set(CANOPY_CX, CANOPY_CY + 8)
+    cover.scale.set(0)
+    cover.visible = false
+    cover.filters = [new DropShadowFilter({ alpha: 0.25, blur: 3 })]
+    this.app.stage.addChild(cover)
+    this.cover = cover
   }
 
   private banana(): Text {
@@ -119,6 +137,11 @@ export class MonkeyScene {
     this.destroySpent()
     for (const banana of this.bananas) banana.destroy()
     this.bananas = []
+    this.coverTween?.kill()
+    if (this.cover) {
+      this.cover.visible = false
+      this.cover.scale.set(0)
+    }
     if (this.equation) this.equation.text = `${total} − ${stolen} = ?`
 
     const rows = Math.ceil(total / PER_ROW)
@@ -142,8 +165,25 @@ export class MonkeyScene {
   }
 
   private scheduleSteal(total: number, stolen: number): void {
-    const startDelay = total * 0.05 + 0.5
+    const startDelay = total * 0.05 + 0.6
     this.track(gsap.delayedCall(startDelay, () => this.steal(stolen)))
+    const stealDuration = 0.5 + (stolen - 1) * 0.18
+    this.track(gsap.delayedCall(startDelay + stealDuration + 0.25, () => this.showCover()))
+  }
+
+  private showCover(): void {
+    if (!this.cover) return
+    this.cover.visible = true
+    this.coverTween = gsap.to(this.cover.scale, { x: 1, y: 1, duration: 0.4, ease: 'back.out(2)' })
+    this.track(this.coverTween)
+  }
+
+  // Open the leaves to reveal the remaining bananas — confirms a correct answer.
+  reveal(): void {
+    if (!this.cover) return
+    this.coverTween?.kill()
+    this.coverTween = gsap.to(this.cover.scale, { x: 0, y: 0, duration: 0.3, ease: 'power2.in' })
+    this.track(this.coverTween)
   }
 
   private steal(stolen: number): void {
@@ -178,6 +218,8 @@ export class MonkeyScene {
     this.spent = []
     this.monkey = null
     this.equation = null
+    this.cover = null
+    this.coverTween = null
     if (this.app) {
       try {
         this.app.destroy(true, { children: true, texture: true })

@@ -85,8 +85,10 @@ export default defineComponent({
   },
   methods: {
     pickRound() {
+      // total >= 2, 1 <= stolen < total, so the answer is always between 1 and
+      // total-1 (the monkey never takes them all — no "0" answers).
       let problem = generateSubtraction(MONKEY_MAX, this.rng)
-      while (problem.a < 2 || problem.b < 1) {
+      while (problem.a < 2 || problem.b < 1 || problem.b >= problem.a) {
         problem = generateSubtraction(MONKEY_MAX, this.rng)
       }
       this.total = problem.a
@@ -110,6 +112,7 @@ export default defineComponent({
         submit(false)
         return
       }
+      this.scene?.reveal()
       this.scene?.cheer()
       submit(true)
     }

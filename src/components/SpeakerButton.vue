@@ -32,6 +32,10 @@ export default defineComponent({
   },
   methods: {
     repeat() {
+      if (audio.isSpeaking()) {
+        audio.stop()
+        return
+      }
       if (this.parts.length > 0) {
         audio.speakParts(this.parts)
         return
