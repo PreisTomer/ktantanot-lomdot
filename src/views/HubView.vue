@@ -2,10 +2,13 @@
 <template>
   <section class="hub">
     <header class="hub__header">
-      <h1 class="hub__title">{{ $t('hub.title') }}</h1>
+      <div class="hub__titles">
+        <h1 class="hub__title">{{ $t('hub.title') }}</h1>
+        <p class="hub__subtitle">{{ $t('hub.prompt') }}</p>
+      </div>
       <SpeakerButton :text="$t('hub.prompt')" />
     </header>
-    <div class="hub__grid">
+    <div ref="grid" class="hub__grid">
       <WorldCard
         v-for="world in worlds"
         :key="world.id"
@@ -18,6 +21,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import gsap from 'gsap'
 
 import { audio } from '@/services/audio'
 
@@ -38,8 +42,21 @@ export default defineComponent({
   },
   mounted() {
     audio.speak(this.$t('hub.prompt'))
+    this.animateIn()
   },
   methods: {
+    animateIn() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      const cards = (this.$refs.grid as HTMLElement).children
+      gsap.from(cards, {
+        y: 40,
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.5,
+        ease: 'back.out(1.7)',
+        stagger: 0.08
+      })
+    },
     openWorld(world: WorldDef) {
       audio.speak(this.$t(`worlds.${world.id}.prompt`))
       this.$router.push({ name: ROUTE.WORLD, params: { worldId: world.id } })
@@ -49,32 +66,43 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/mixins' as *;
-
 .hub {
   inline-size: 100%;
-  max-inline-size: 60rem;
+  max-inline-size: 64rem;
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--sp-md);
-    margin-block-end: var(--sp-lg);
+    margin-block-end: var(--sp-xl);
+  }
+
+  &__titles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-xs);
   }
 
   &__title {
     margin: 0;
-    font-size: var(--fs-lg);
+    font-size: var(--fs-2xl);
+    font-weight: 700;
     color: var(--color-ink);
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--color-ink-soft);
   }
 
   &__grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--sp-md);
+    gap: var(--sp-lg);
 
-    @media (min-width: 720px) {
+    @media (min-width: 760px) {
       grid-template-columns: repeat(4, 1fr);
     }
   }

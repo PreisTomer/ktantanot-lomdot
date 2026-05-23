@@ -74,3 +74,42 @@
   display: none;
   @media (min-width: $min) { display: block; }
 }
+
+// Dimensional tile keyed off a local --tile-color: gradient body, glossy top
+// highlight, layered float shadow, and a springy press.
+@mixin dimensional-tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--tile-color) 78%, white) 0%,
+    var(--tile-color) 60%,
+    color-mix(in srgb, var(--tile-color) 80%, black) 100%
+  );
+  box-shadow: var(--shadow-float);
+  transition: transform var(--tr-fast), box-shadow var(--tr-fast);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 42%;
+    background: linear-gradient(to bottom, color-mix(in srgb, white 45%, transparent), transparent);
+    pointer-events: none;
+  }
+
+  &:active {
+    transform: translateY(6px) scale(0.98);
+    box-shadow: var(--shadow-press);
+  }
+}
+
+// Frosted translucent surface for floating controls.
+@mixin glass {
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-soft);
+}

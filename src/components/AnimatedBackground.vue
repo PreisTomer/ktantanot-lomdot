@@ -1,9 +1,13 @@
 <!-- Copyright © 2026 Tomer Preis. Licensed under the MIT License. -->
 <template>
   <div class="bg" aria-hidden="true">
-    <span class="bg__blob bg__blob--1"></span>
-    <span class="bg__blob bg__blob--2"></span>
-    <span class="bg__blob bg__blob--3"></span>
+    <div class="bg__sky"></div>
+    <span class="bg__orb bg__orb--1"></span>
+    <span class="bg__orb bg__orb--2"></span>
+    <span class="bg__orb bg__orb--3"></span>
+    <span class="bg__orb bg__orb--4"></span>
+    <div class="bg__hill bg__hill--far"></div>
+    <div class="bg__hill bg__hill--near"></div>
     <span class="bg__sparkle bg__sparkle--1">{{ icon.STAR }}</span>
     <span class="bg__sparkle bg__sparkle--2">{{ icon.HEART }}</span>
     <span class="bg__sparkle bg__sparkle--3">{{ icon.STAR }}</span>
@@ -33,63 +37,98 @@ export default defineComponent({
   inset: 0;
   z-index: -1;
   overflow: hidden;
-  background: linear-gradient(160deg, var(--color-bg) 0%, var(--color-bg-2) 100%);
 
-  &__blob {
+  &__sky {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 80% at 70% -10%, color-mix(in srgb, var(--color-sky) 38%, var(--color-bg)) 0%, transparent 60%),
+      linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-2) 100%);
+  }
+
+  &__orb {
     position: absolute;
     border-radius: var(--radius-pill);
-    filter: blur(2px);
+    filter: blur(6px);
     opacity: var(--op-ghost);
 
     &--1 {
-      inline-size: 240px;
-      block-size: 240px;
-      inset-block-start: -60px;
-      inset-inline-end: -40px;
-      background: color-mix(in srgb, var(--color-sky) 60%, transparent);
-      @include ambient(float, 7s);
+      inline-size: 320px;
+      block-size: 320px;
+      inset-block-start: -80px;
+      inset-inline-end: -60px;
+      background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--color-sky) 70%, white), var(--color-sky));
+      @include ambient(float, 9s);
     }
 
     &--2 {
-      inline-size: 180px;
-      block-size: 180px;
-      inset-block-end: -50px;
-      inset-inline-start: -30px;
-      background: color-mix(in srgb, var(--color-coral) 55%, transparent);
-      @include ambient(drift, 9s);
+      inline-size: 240px;
+      block-size: 240px;
+      inset-block-end: 6%;
+      inset-inline-start: -50px;
+      background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--color-coral) 70%, white), var(--color-coral));
+      @include ambient(drift, 12s);
     }
 
     &--3 {
-      inline-size: 140px;
-      block-size: 140px;
-      inset-block-start: 40%;
-      inset-inline-start: 12%;
-      background: color-mix(in srgb, var(--color-leaf) 55%, transparent);
+      inline-size: 180px;
+      block-size: 180px;
+      inset-block-start: 32%;
+      inset-inline-start: 14%;
+      background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--color-leaf) 70%, white), var(--color-leaf));
       @include ambient(float, 11s);
+    }
+
+    &--4 {
+      inline-size: 150px;
+      block-size: 150px;
+      inset-block-start: 12%;
+      inset-inline-start: 44%;
+      background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--color-grape) 70%, white), var(--color-grape));
+      @include ambient(drift, 10s);
+    }
+  }
+
+  &__hill {
+    position: absolute;
+    inset-inline: -10%;
+    border-start-start-radius: 50%;
+    border-start-end-radius: 50%;
+
+    &--far {
+      inset-block-end: 0;
+      block-size: 22%;
+      background: color-mix(in srgb, var(--color-leaf) 40%, var(--color-bg-2));
+    }
+
+    &--near {
+      inset-block-end: 0;
+      block-size: 13%;
+      background: color-mix(in srgb, var(--color-leaf) 60%, var(--color-bg-2));
     }
   }
 
   &__sparkle {
     position: absolute;
     font-size: var(--fs-lg);
-    opacity: var(--op-ghost);
+    opacity: var(--op-muted);
     @include decorative-from(900px);
 
     &--1 {
       inset-block-start: 18%;
-      inset-inline-start: 22%;
+      inset-inline-start: 24%;
       @include ambient(twinkle, 4s);
     }
 
     &--2 {
-      inset-block-start: 64%;
-      inset-inline-end: 18%;
+      inset-block-start: 60%;
+      inset-inline-end: 20%;
       @include ambient(twinkle, 5s);
     }
 
     &--3 {
-      inset-block-end: 14%;
-      inset-inline-start: 40%;
+      inset-block-start: 30%;
+      inset-inline-end: 30%;
       @include ambient(twinkle, 6s);
     }
   }
