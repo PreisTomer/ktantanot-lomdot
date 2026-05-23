@@ -39,6 +39,7 @@ export default defineComponent({
       start: 0,
       add: 1,
       target: 1,
+      recent: [] as number[],
       isAnimating: false,
       scene: null as FrogScene | null,
       rng: createRng(Date.now()) as Rng
@@ -70,10 +71,19 @@ export default defineComponent({
   },
   methods: {
     pickRound() {
-      const jump = generateJump(FROG_MAX, this.rng)
+      // Avoid repeating a recent landing so the same number doesn't keep
+      // coming up round after round.
+      let jump = generateJump(FROG_MAX, this.rng)
+      let guard = 0
+      while (this.recent.includes(jump.target) && guard < 20) {
+        jump = generateJump(FROG_MAX, this.rng)
+        guard++
+      }
       this.start = jump.start
       this.add = jump.add
       this.target = jump.target
+      this.recent.push(jump.target)
+      if (this.recent.length > 4) this.recent.shift()
     },
     nextRound() {
       this.isAnimating = false

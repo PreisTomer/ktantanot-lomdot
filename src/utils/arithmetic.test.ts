@@ -53,12 +53,13 @@ describe('generateSubtraction', () => {
 })
 
 describe('generateJump', () => {
-  it('keeps the landing on or below the max and jumps at least one', () => {
-    for (let seed = 0; seed < 60; seed++) {
+  it('stays in range with a real jump (start 0..max, landing 1..max)', () => {
+    for (let seed = 0; seed < 80; seed++) {
       const jump = generateJump(10, createRng(seed))
       expect(jump.target).toBe(jump.start + jump.add)
       expect(jump.add).toBeGreaterThanOrEqual(1)
       expect(jump.start).toBeGreaterThanOrEqual(0)
+      expect(jump.target).toBeGreaterThanOrEqual(1)
       expect(jump.target).toBeLessThanOrEqual(10)
     }
   })

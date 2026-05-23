@@ -11,7 +11,8 @@ export const READY_GAMES: ReadonlySet<GameId> = new Set([
   GAME_ID.CATCH_WORD,
   GAME_ID.SOUND_DETECTIVE,
   GAME_ID.THIEF_MONKEY,
-  GAME_ID.FROG_JUMPS
+  GAME_ID.FROG_JUMPS,
+  GAME_ID.BEAR_RESTAURANT
 ])
 
 // Array order is DOM order; under RTL the first entry sits on the right,

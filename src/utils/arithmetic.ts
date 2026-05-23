@@ -47,15 +47,17 @@ export interface JumpProblem {
 }
 
 /**
- * Generate a number-line addition jump: the frog starts on `start` and jumps
- * `add` more, landing on `target` (never past `max`).
+ * Generate a number-line addition jump. The landing (target) is drawn first,
+ * uniformly across 1..max, then split into start + add. This keeps every
+ * landing equally likely — so 0 and max still occur, just not over-represented
+ * the way "pick start, then jump to the end" made them.
  * @param max - the highest number on the line
  * @param rng - injected randomness source (seed it in tests)
  */
 export function generateJump(max: number, rng: Rng): JumpProblem {
-  const start = Math.floor(rng() * max)
-  const add = 1 + Math.floor(rng() * (max - start))
-  return { start, add, target: start + add }
+  const target = 1 + Math.floor(rng() * max)
+  const start = Math.floor(rng() * target)
+  return { start, add: target - start, target }
 }
 
 function buildOptions(answer: number, maxSum: number, rng: Rng): number[] {
