@@ -8,7 +8,7 @@
       </div>
       <SpeakerButton :text="$t('hub.prompt')" />
     </header>
-    <div ref="grid" class="hub__grid">
+    <div class="hub__grid">
       <WorldCard
         v-for="world in worlds"
         :key="world.id"
@@ -21,7 +21,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import gsap from 'gsap'
 
 import { audio } from '@/services/audio'
 
@@ -42,27 +41,8 @@ export default defineComponent({
   },
   mounted() {
     audio.speak(this.$t('hub.prompt'))
-    this.animateIn()
   },
   methods: {
-    animateIn() {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-      const cards = (this.$refs.grid as HTMLElement).children
-      // Defer past the route enter-transition so GSAP doesn't race the
-      // ancestor transform; clearProps strips inline styles so cards settle
-      // back into clean grid alignment.
-      requestAnimationFrame(() => {
-        gsap.from(cards, {
-          y: 48,
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power3.out',
-          stagger: 0.08,
-          overwrite: true,
-          clearProps: 'all'
-        })
-      })
-    },
     openWorld(world: WorldDef) {
       audio.speak(this.$t(`worlds.${world.id}.prompt`))
       this.$router.push({ name: ROUTE.WORLD, params: { worldId: world.id } })
@@ -110,6 +90,19 @@ export default defineComponent({
 
     @media (min-width: 760px) {
       grid-template-columns: repeat(4, 1fr);
+    }
+
+    // Staggered entrance via CSS only: leaves no inline styles, so a settled
+    // grid is always in clean alignment regardless of how fast the user
+    // navigates (backwards fill releases to natural state, keeping :active).
+    > * {
+      animation: bounce-in 0.5s var(--ease-spring) backwards;
+    }
+
+    @for $i from 1 through 6 {
+      > :nth-child(#{$i}) {
+        animation-delay: #{($i - 1) * 0.08}s;
+      }
     }
   }
 }

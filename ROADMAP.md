@@ -19,8 +19,8 @@ playable; the rest show `ComingSoonGame` with a "בקרוב" badge.
 - [ ] **ספר הקסם** — interactive story; tapping a word animates its meaning
 
 ### חשבון (math)
+- [x] **הקוף הגנב** — monkey steals bananas from the tree; solve the subtraction
 - [ ] **המסעדה של הדוב** — drag cakes to the plate to add (2 + 3)
-- [ ] **הקוף הגנב** — monkey steals bananas; solve the subtraction
 - [ ] **קפיצות צפרדע** — frog hops along a number line to add
 - [ ] **בנה את המגדל** — each correct answer stacks another block
 

@@ -9,7 +9,7 @@
     "soundDetective": { "title": "הבלשית", "prompt": "מצאי מילה שמתחילה באות {letter}", "instruction": "איזו מילה מתחילה באות" },
     "magicBook": { "title": "ספר הקסם" },
     "bearRestaurant": { "title": "המסעדה של הדוב" },
-    "thiefMonkey": { "title": "הקוף הגנב" },
+    "thiefMonkey": { "title": "הקוף הגנב", "prompt": "כמה בננות נשארו?", "story": "הקוף הגנב לקח {stolen} בננות מהעץ" },
     "frogJumps": { "title": "קפיצות צפרדע" },
     "buildTower": { "title": "בנה את המגדל" },
     "whatInRoom": { "title": "מה היה בחדר?" },

@@ -10,6 +10,7 @@ import type { Component } from 'vue'
 import SyllableTrainGame from '@/components/games/SyllableTrain/index.vue'
 import CatchWordGame from '@/components/games/CatchWord/index.vue'
 import DetectiveGame from '@/components/games/Detective/index.vue'
+import ThiefMonkeyGame from '@/components/games/ThiefMonkey/index.vue'
 import ComingSoonGame from '@/components/games/ComingSoonGame.vue'
 
 import { GAME_ID, ROUTE } from '@/constants/strings'
@@ -30,7 +31,7 @@ const REGISTRY: Record<GameId, GameEntry> = {
   [GAME_ID.SOUND_DETECTIVE]: { is: DetectiveGame, props: {} },
   [GAME_ID.MAGIC_BOOK]: comingSoon(GAME_ID.MAGIC_BOOK),
   [GAME_ID.BEAR_RESTAURANT]: comingSoon(GAME_ID.BEAR_RESTAURANT),
-  [GAME_ID.THIEF_MONKEY]: comingSoon(GAME_ID.THIEF_MONKEY),
+  [GAME_ID.THIEF_MONKEY]: { is: ThiefMonkeyGame, props: {} },
   [GAME_ID.FROG_JUMPS]: comingSoon(GAME_ID.FROG_JUMPS),
   [GAME_ID.BUILD_TOWER]: comingSoon(GAME_ID.BUILD_TOWER),
   [GAME_ID.WHAT_IN_ROOM]: comingSoon(GAME_ID.WHAT_IN_ROOM),

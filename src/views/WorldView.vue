@@ -6,7 +6,7 @@
       <h1 class="world__title">{{ $t(`worlds.${world.id}.name`) }}</h1>
       <SpeakerButton :text="$t(`worlds.${world.id}.prompt`)" />
     </header>
-    <div ref="grid" class="world__games">
+    <div class="world__games">
       <button
         v-for="game in world.games"
         :key="game.id"
@@ -24,7 +24,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import gsap from 'gsap'
 
 import { audio } from '@/services/audio'
 
@@ -59,30 +58,10 @@ export default defineComponent({
       return
     }
     audio.speak(this.$t(`worlds.${this.world.id}.prompt`))
-    this.animateIn()
   },
   methods: {
     isReady(gameId: GameId): boolean {
       return READY_GAMES.has(gameId)
-    },
-    animateIn() {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-      const grid = this.$refs.grid as HTMLElement | undefined
-      if (!grid) return
-      // Defer past the route enter-transition so GSAP doesn't race the
-      // ancestor transform; clearProps strips inline styles so tiles settle
-      // back into clean grid alignment.
-      requestAnimationFrame(() => {
-        gsap.from(grid.children, {
-          y: 40,
-          opacity: 0,
-          duration: 0.45,
-          ease: 'power3.out',
-          stagger: 0.07,
-          overwrite: true,
-          clearProps: 'all'
-        })
-      })
     },
     openGame(game: GameDef) {
       this.$router.push({ name: ROUTE.GAME, params: { gameId: game.id } })
@@ -120,6 +99,18 @@ export default defineComponent({
 
     @media (min-width: 760px) {
       grid-template-columns: repeat(3, 1fr);
+    }
+
+    // CSS-only staggered entrance: no inline styles, so a settled grid is
+    // always aligned no matter how fast the user navigates.
+    > * {
+      animation: bounce-in 0.45s var(--ease-spring) backwards;
+    }
+
+    @for $i from 1 through 6 {
+      > :nth-child(#{$i}) {
+        animation-delay: #{($i - 1) * 0.07}s;
+      }
     }
   }
 
