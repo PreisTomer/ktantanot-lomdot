@@ -48,12 +48,19 @@ export default defineComponent({
     animateIn() {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
       const cards = (this.$refs.grid as HTMLElement).children
-      gsap.from(cards, {
-        y: 48,
-        opacity: 0,
-        duration: 0.5,
-        ease: 'power3.out',
-        stagger: 0.08
+      // Defer past the route enter-transition so GSAP doesn't race the
+      // ancestor transform; clearProps strips inline styles so cards settle
+      // back into clean grid alignment.
+      requestAnimationFrame(() => {
+        gsap.from(cards, {
+          y: 48,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power3.out',
+          stagger: 0.08,
+          overwrite: true,
+          clearProps: 'all'
+        })
       })
     },
     openWorld(world: WorldDef) {

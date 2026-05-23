@@ -32,20 +32,20 @@ import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
 
 import { CATCH_BALLOONS, CATCH_ROUNDS } from '@/constants/gameConfig'
-import { PICTURE_WORDS } from '@/constants/words'
+import { CATCH_WORDS } from '@/constants/words'
 import type { PictureWord } from '@/constants/words'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { BalloonScene } from './balloonScene'
 
-const WORD_POOL = PICTURE_WORDS.map((entry) => entry.word)
+const WORD_POOL = CATCH_WORDS.map((entry) => entry.word)
 
 export default defineComponent({
   name: 'CatchWordGame',
   components: { GameShell },
   data() {
     return {
-      target: PICTURE_WORDS[0] as PictureWord,
+      target: CATCH_WORDS[0] as PictureWord,
       isAnimating: false,
       recent: [] as string[],
       scene: null as BalloonScene | null,
@@ -81,7 +81,7 @@ export default defineComponent({
       const word = pickNextItem(WORD_POOL, stats, this.rng, this.recent)
       this.recent.push(word)
       if (this.recent.length > WORD_POOL.length - 1) this.recent.shift()
-      this.target = PICTURE_WORDS.find((entry) => entry.word === word) ?? PICTURE_WORDS[0]
+      this.target = CATCH_WORDS.find((entry) => entry.word === word) ?? CATCH_WORDS[0]
     },
     roundWords(): string[] {
       return buildChoices(this.target.word, WORD_POOL, CATCH_BALLOONS, this.rng)

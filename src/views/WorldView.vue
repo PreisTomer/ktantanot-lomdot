@@ -69,12 +69,19 @@ export default defineComponent({
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
       const grid = this.$refs.grid as HTMLElement | undefined
       if (!grid) return
-      gsap.from(grid.children, {
-        y: 40,
-        opacity: 0,
-        duration: 0.45,
-        ease: 'power3.out',
-        stagger: 0.07
+      // Defer past the route enter-transition so GSAP doesn't race the
+      // ancestor transform; clearProps strips inline styles so tiles settle
+      // back into clean grid alignment.
+      requestAnimationFrame(() => {
+        gsap.from(grid.children, {
+          y: 40,
+          opacity: 0,
+          duration: 0.45,
+          ease: 'power3.out',
+          stagger: 0.07,
+          overwrite: true,
+          clearProps: 'all'
+        })
       })
     },
     openGame(game: GameDef) {

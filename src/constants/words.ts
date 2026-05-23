@@ -1,5 +1,10 @@
 // Copyright © 2026 Tomer Preis. Licensed under the MIT License.
 
+export interface PictureWord {
+  word: string
+  picture: string
+}
+
 export interface WordCard {
   word: string
   picture: string
@@ -8,38 +13,44 @@ export interface WordCard {
   options: [string, string, string]
 }
 
-export interface PictureWord {
-  word: string
-  picture: string
-}
-
-// Picturable words for whole-word recognition: the child sees a picture and
-// pops the balloon whose word matches it (catch the word).
-export const PICTURE_WORDS: PictureWord[] = [
-  { word: 'שמש', picture: '☀️' },
-  { word: 'בית', picture: '🏠' },
-  { word: 'כלב', picture: '🐶' },
-  { word: 'חתול', picture: '🐱' },
-  { word: 'דג', picture: '🐟' },
-  { word: 'פרח', picture: '🌸' },
-  { word: 'עץ', picture: '🌳' },
-  { word: 'כדור', picture: '⚽' },
-  { word: 'פיל', picture: '🐘' },
-  { word: 'דוב', picture: '🐻' },
-  { word: 'סוס', picture: '🐴' },
-  { word: 'פרה', picture: '🐮' },
-  { word: 'ירח', picture: '🌙' },
-  { word: 'עוגה', picture: '🍰' }
+// רכבת ההברות — everyday objects, three letters with a missing middle letter.
+export const SYLLABLE_WORDS: WordCard[] = [
+  { word: 'כתר', picture: '👑', missingIndex: 1, options: ['ת', 'מ', 'ק'] },
+  { word: 'נעל', picture: '👟', missingIndex: 1, options: ['ע', 'א', 'ה'] },
+  { word: 'ספר', picture: '📖', missingIndex: 1, options: ['פ', 'ב', 'כ'] },
+  { word: 'דלת', picture: '🚪', missingIndex: 1, options: ['ל', 'מ', 'נ'] },
+  { word: 'תות', picture: '🍓', missingIndex: 1, options: ['ו', 'י', 'ה'] },
+  { word: 'גזר', picture: '🥕', missingIndex: 1, options: ['ז', 'ר', 'ד'] },
+  { word: 'שלג', picture: '❄️', missingIndex: 1, options: ['ל', 'מ', 'נ'] },
+  { word: 'כסא', picture: '🪑', missingIndex: 1, options: ['ס', 'ז', 'ר'] }
 ]
 
-// Three-letter words with a missing middle letter, each with a clear picture.
-export const SYLLABLE_WORDS: WordCard[] = [
-  { word: 'בית', picture: '🏠', missingIndex: 1, options: ['י', 'ו', 'ה'] },
-  { word: 'כלב', picture: '🐶', missingIndex: 1, options: ['ל', 'מ', 'נ'] },
-  { word: 'שמש', picture: '☀️', missingIndex: 1, options: ['מ', 'נ', 'ס'] },
-  { word: 'פיל', picture: '🐘', missingIndex: 1, options: ['י', 'ו', 'ר'] },
-  { word: 'דוב', picture: '🐻', missingIndex: 1, options: ['ו', 'י', 'ה'] },
-  { word: 'סוס', picture: '🐴', missingIndex: 1, options: ['ו', 'י', 'נ'] },
-  { word: 'פרה', picture: '🐮', missingIndex: 1, options: ['ר', 'ד', 'ל'] },
-  { word: 'גמל', picture: '🐪', missingIndex: 1, options: ['מ', 'נ', 'ב'] }
+// תפסי את המילה — animals to catch.
+export const CATCH_WORDS: PictureWord[] = [
+  { word: 'חתול', picture: '🐱' },
+  { word: 'כלב', picture: '🐶' },
+  { word: 'ארנב', picture: '🐰' },
+  { word: 'דג', picture: '🐟' },
+  { word: 'ציפור', picture: '🐦' },
+  { word: 'פרפר', picture: '🦋' },
+  { word: 'דבורה', picture: '🐝' },
+  { word: 'צב', picture: '🐢' },
+  { word: 'נמר', picture: '🐅' },
+  { word: 'סוס', picture: '🐴' }
+]
+
+// הבלשית — food & nature, chosen for a wide spread of initial letters.
+export const DETECTIVE_WORDS: PictureWord[] = [
+  { word: 'אבטיח', picture: '🍉' },
+  { word: 'בננה', picture: '🍌' },
+  { word: 'גלידה', picture: '🍦' },
+  { word: 'ורד', picture: '🌹' },
+  { word: 'זית', picture: '🫒' },
+  { word: 'חלב', picture: '🥛' },
+  { word: 'טרקטור', picture: '🚜' },
+  { word: 'לחם', picture: '🍞' },
+  { word: 'מלפפון', picture: '🥒' },
+  { word: 'עוגה', picture: '🍰' },
+  { word: 'פיצה', picture: '🍕' },
+  { word: 'תפוח', picture: '🍎' }
 ]

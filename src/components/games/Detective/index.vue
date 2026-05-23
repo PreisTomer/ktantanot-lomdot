@@ -28,14 +28,14 @@ import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
 
 import { DETECTIVE_OPTIONS, DETECTIVE_ROUNDS } from '@/constants/gameConfig'
-import { PICTURE_WORDS } from '@/constants/words'
+import { DETECTIVE_WORDS } from '@/constants/words'
 import type { PictureWord } from '@/constants/words'
 import { LETTER_NAMES } from '@/constants/letters'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { DetectiveScene } from './detectiveScene'
 
-const INITIALS = availableInitials(PICTURE_WORDS, DETECTIVE_OPTIONS)
+const INITIALS = availableInitials(DETECTIVE_WORDS, DETECTIVE_OPTIONS)
 
 export default defineComponent({
   name: 'DetectiveGame',
@@ -79,7 +79,7 @@ export default defineComponent({
       this.target = pickNextItem(INITIALS, stats, this.rng, this.recent)
       this.recent.push(this.target)
       if (this.recent.length > INITIALS.length - 1) this.recent.shift()
-      this.options = buildSoundOptions(PICTURE_WORDS, this.target, DETECTIVE_OPTIONS, this.rng)
+      this.options = buildSoundOptions(DETECTIVE_WORDS, this.target, DETECTIVE_OPTIONS, this.rng)
     },
     nextRound() {
       this.pickRound()
