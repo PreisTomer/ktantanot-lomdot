@@ -1,6 +1,6 @@
 // Copyright © 2026 Tomer Preis. Licensed under the MIT License.
 
-import { generateAddition } from '@/utils/arithmetic'
+import { generateAddition, generateSubtraction } from '@/utils/arithmetic'
 import { createRng } from '@/utils/rng'
 
 describe('generateAddition', () => {
@@ -32,6 +32,22 @@ describe('generateAddition', () => {
   it('caps option count when the range is smaller than four', () => {
     const problem = generateAddition(2, createRng(1))
     expect(problem.options.length).toBeLessThanOrEqual(3)
+    expect(problem.options).toContain(problem.answer)
+  })
+})
+
+describe('generateSubtraction', () => {
+  it('never produces a negative answer', () => {
+    for (let seed = 0; seed < 50; seed++) {
+      const problem = generateSubtraction(10, createRng(seed))
+      expect(problem.answer).toBe(problem.a - problem.b)
+      expect(problem.answer).toBeGreaterThanOrEqual(0)
+      expect(problem.b).toBeLessThanOrEqual(problem.a)
+    }
+  })
+
+  it('includes the correct answer among the options', () => {
+    const problem = generateSubtraction(10, createRng(6))
     expect(problem.options).toContain(problem.answer)
   })
 })

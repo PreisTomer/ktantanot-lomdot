@@ -15,6 +15,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/WorldView.vue'),
     props: true
   },
+  {
+    path: '/game/:gameId',
+    name: ROUTE.GAME,
+    component: () => import('@/views/GameHost.vue'),
+    props: true
+  },
   { path: '/:pathMatch(.*)*', redirect: { name: ROUTE.HUB } }
 ]
 

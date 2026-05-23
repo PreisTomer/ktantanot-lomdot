@@ -12,9 +12,10 @@
         :key="game.id"
         class="world__game"
         type="button"
-        @click="announceComingSoon"
+        @click="openGame(game)"
       >
         <span class="world__game-icon">{{ game.icon }}</span>
+        <span class="world__game-name">{{ $t(`games.${game.id}.title`) }}</span>
       </button>
     </div>
   </section>
@@ -29,9 +30,8 @@ import BackButton from '@/components/BackButton.vue'
 import SpeakerButton from '@/components/SpeakerButton.vue'
 
 import { WORLDS } from '@/constants/worlds'
-import { PHRASE } from '@/constants/phrases'
 import { ROUTE } from '@/constants/strings'
-import type { WorldDef } from '@/types/world'
+import type { GameDef, WorldDef } from '@/types/world'
 
 export default defineComponent({
   name: 'WorldView',
@@ -58,8 +58,8 @@ export default defineComponent({
     audio.speak(this.$t(`worlds.${this.world.id}.prompt`))
   },
   methods: {
-    announceComingSoon() {
-      audio.playPhrase(PHRASE.comingSoon)
+    openGame(game: GameDef) {
+      this.$router.push({ name: ROUTE.GAME, params: { gameId: game.id } })
     }
   }
 })
@@ -97,14 +97,21 @@ export default defineComponent({
   }
 
   &__game {
-    @include flex-center;
+    @include flex-column-center;
     @include pressable;
+    gap: var(--sp-sm);
     min-block-size: 8rem;
     background: color-mix(in srgb, var(--world-color) 18%, var(--color-surface));
 
     &-icon {
       font-size: var(--fs-xl);
       @include ambient(wiggle, 6s);
+    }
+
+    &-name {
+      font-size: var(--fs-sm);
+      font-weight: 700;
+      color: var(--color-ink);
     }
   }
 }

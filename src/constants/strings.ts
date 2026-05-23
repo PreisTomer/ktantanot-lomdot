@@ -28,9 +28,13 @@ export const REWARD_TYPE = {
 
 export type RewardType = (typeof REWARD_TYPE)[keyof typeof REWARD_TYPE]
 
+// Single shared player until avatars/profiles are introduced.
+export const DEFAULT_PROFILE_ID = 'guest'
+
 export const ROUTE = {
   HUB: 'hub',
-  WORLD: 'world'
+  WORLD: 'world',
+  GAME: 'game'
 } as const
 
 export type RouteName = (typeof ROUTE)[keyof typeof ROUTE]
