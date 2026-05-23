@@ -43,7 +43,10 @@ export const SCENE = {
   wheelRim: '#b9a79f',
   steam: '#ffffff',
   carEmpty: '#ffe8c2',
-  letterInk: '#3a2e2a'
+  letterInk: '#3a2e2a',
+  leaf: '#80ed99',
+  leafDeep: '#38b000',
+  white: '#ffffff'
 } as const
 
 // Confetti / reward bursts draw from the full bright palette.

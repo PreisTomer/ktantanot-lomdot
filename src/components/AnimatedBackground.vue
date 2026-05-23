@@ -14,6 +14,21 @@
     <span class="bg__bubble bg__bubble--6"></span>
     <div class="bg__hill bg__hill--far"></div>
     <div class="bg__hill bg__hill--near"></div>
+    <div class="bg__house">
+      <span class="bg__house-roof"></span>
+      <span class="bg__house-door"></span>
+    </div>
+    <span class="bg__mushroom bg__mushroom--1"></span>
+    <span class="bg__mushroom bg__mushroom--2"></span>
+    <span class="bg__mushroom bg__mushroom--3"></span>
+    <div v-if="isHub" class="bg__gnome">
+      <div class="bg__gnome-walk">
+        <span class="bg__gnome-hat"></span>
+        <span class="bg__gnome-nose"></span>
+        <span class="bg__gnome-beard"></span>
+        <span class="bg__gnome-body"></span>
+      </div>
+    </div>
     <span class="bg__star bg__star--1"></span>
     <span class="bg__star bg__star--2"></span>
     <span class="bg__star bg__star--3"></span>
@@ -24,6 +39,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
+import { ROUTE } from '@/constants/strings'
+
 // Per-orb parallax depth (px of travel across the full viewport).
 const ORB_DEPTH = [26, 40, 18, 52]
 
@@ -33,6 +50,11 @@ export default defineComponent({
     return {
       orbs: [] as HTMLElement[],
       pointerHandler: null as ((event: PointerEvent) => void) | null
+    }
+  },
+  computed: {
+    isHub(): boolean {
+      return this.$route.name === ROUTE.HUB
     }
   },
   mounted() {
@@ -134,6 +156,155 @@ export default defineComponent({
       block-size: 13%;
       background: color-mix(in srgb, var(--color-leaf) 60%, var(--color-bg-2));
     }
+  }
+
+  // A little cottage tucked on the hill: warm walls, coral roof, a door.
+  &__house {
+    position: absolute;
+    inset-block-end: 12%;
+    inset-inline-start: 14%;
+    inline-size: 64px;
+    block-size: 44px;
+    background: color-mix(in srgb, var(--color-sun) 26%, white);
+    border-radius: 5px 5px 0 0;
+    box-shadow: var(--shadow-soft);
+    @include decorative-from(700px);
+
+    &-roof {
+      position: absolute;
+      inset-block-start: -22px;
+      inset-inline-start: 50%;
+      translate: -50% 0;
+      inline-size: 0;
+      block-size: 0;
+      border-inline-start: 42px solid transparent;
+      border-inline-end: 42px solid transparent;
+      border-block-end: 24px solid var(--color-coral);
+    }
+
+    &-door {
+      position: absolute;
+      inset-block-end: 0;
+      inset-inline-start: 50%;
+      translate: -50% 0;
+      inline-size: 18px;
+      block-size: 26px;
+      background: color-mix(in srgb, var(--color-grape) 65%, var(--color-ink));
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+  }
+
+  // Toadstools dotted along the grass: cream stem, red dome with a shine.
+  &__mushroom {
+    position: absolute;
+    inset-block-end: 11%;
+    inline-size: 22px;
+    block-size: 26px;
+    transform-origin: bottom center;
+    @include decorative-from(700px);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset-block-end: 0;
+      inset-inline-start: 50%;
+      translate: -50% 0;
+      inline-size: 10px;
+      block-size: 14px;
+      background: color-mix(in srgb, var(--color-sun) 20%, white);
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: 50%;
+      translate: -50% 0;
+      inline-size: 22px;
+      block-size: 13px;
+      background: var(--color-coral);
+      border-start-start-radius: 50%;
+      border-start-end-radius: 50%;
+      box-shadow: inset -3px -2px 0 color-mix(in srgb, var(--color-coral-deep) 45%, transparent);
+    }
+
+    &--1 {
+      inset-inline-start: 30%;
+    }
+
+    &--2 {
+      inset-inline-start: 37%;
+      scale: 0.68;
+    }
+
+    &--3 {
+      inset-inline-end: 24%;
+      scale: 0.85;
+    }
+  }
+
+  // A gnome who strolls the hill, only on the hub (no task to distract from).
+  &__gnome {
+    position: absolute;
+    inset-block-end: 10.5%;
+    inset-inline-start: 0;
+    @include decorative-from(700px);
+    @include ambient(stroll, 19s);
+  }
+
+  &__gnome-walk {
+    position: relative;
+    inline-size: 30px;
+    block-size: 46px;
+    @include ambient(waddle, 0.6s);
+  }
+
+  &__gnome-hat {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    inline-size: 0;
+    block-size: 0;
+    border-inline-start: 15px solid transparent;
+    border-inline-end: 15px solid transparent;
+    border-block-end: 24px solid var(--color-coral);
+  }
+
+  &__gnome-nose {
+    position: absolute;
+    inset-block-start: 20px;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    inline-size: 7px;
+    block-size: 7px;
+    background: color-mix(in srgb, var(--color-primary) 32%, white);
+    border-radius: var(--radius-pill);
+    z-index: 1;
+  }
+
+  &__gnome-beard {
+    position: absolute;
+    inset-block-start: 22px;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    inline-size: 0;
+    block-size: 0;
+    border-inline-start: 11px solid transparent;
+    border-inline-end: 11px solid transparent;
+    border-block-start: 18px solid color-mix(in srgb, white 90%, var(--color-sun));
+  }
+
+  &__gnome-body {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    inline-size: 22px;
+    block-size: 18px;
+    background: var(--color-sky-deep);
+    border-radius: var(--radius) var(--radius) 6px 6px;
   }
 
   &__bubble {

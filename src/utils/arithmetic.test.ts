@@ -1,6 +1,6 @@
 // Copyright © 2026 Tomer Preis. Licensed under the MIT License.
 
-import { generateAddition, generateSubtraction } from '@/utils/arithmetic'
+import { generateAddition, generateJump, generateSubtraction } from '@/utils/arithmetic'
 import { createRng } from '@/utils/rng'
 
 describe('generateAddition', () => {
@@ -49,5 +49,17 @@ describe('generateSubtraction', () => {
   it('includes the correct answer among the options', () => {
     const problem = generateSubtraction(10, createRng(6))
     expect(problem.options).toContain(problem.answer)
+  })
+})
+
+describe('generateJump', () => {
+  it('keeps the landing on or below the max and jumps at least one', () => {
+    for (let seed = 0; seed < 60; seed++) {
+      const jump = generateJump(10, createRng(seed))
+      expect(jump.target).toBe(jump.start + jump.add)
+      expect(jump.add).toBeGreaterThanOrEqual(1)
+      expect(jump.start).toBeGreaterThanOrEqual(0)
+      expect(jump.target).toBeLessThanOrEqual(10)
+    }
   })
 })

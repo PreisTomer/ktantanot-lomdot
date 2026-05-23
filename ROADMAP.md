@@ -20,8 +20,8 @@ playable; the rest show `ComingSoonGame` with a "בקרוב" badge.
 
 ### חשבון (math)
 - [x] **הקוף הגנב** — monkey steals bananas from the tree; solve the subtraction
+- [x] **קפיצות צפרדע** — frog hops along a number line to add (tap the landing)
 - [ ] **המסעדה של הדוב** — drag cakes to the plate to add (2 + 3)
-- [ ] **קפיצות צפרדע** — frog hops along a number line to add
 - [ ] **בנה את המגדל** — each correct answer stacks another block
 
 ### זיכרון (memory)

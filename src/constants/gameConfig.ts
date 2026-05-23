@@ -28,6 +28,11 @@ export const MONKEY_ROUNDS = 6
 export const MONKEY_MAX = 9
 export const MONKEY_SCENE_W = 900
 export const MONKEY_SCENE_H = 560
+
+export const FROG_ROUNDS = 6
+export const FROG_MAX = 10
+export const FROG_SCENE_W = 900
+export const FROG_SCENE_H = 460
 export const REWARD_DURATION_MS = 1500
 export const WRONG_FEEDBACK_MS = 600
 export const COUNT_MAX = 10

@@ -10,7 +10,7 @@
     "magicBook": { "title": "ספר הקסם" },
     "bearRestaurant": { "title": "המסעדה של הדוב" },
     "thiefMonkey": { "title": "הקוף הגנב", "prompt": "כמה בננות נשארו?", "story": "הקוף הגנב לקח {stolen} בננות מהעץ" },
-    "frogJumps": { "title": "קפיצות צפרדע" },
+    "frogJumps": { "title": "קפיצות צפרדע", "prompt": "לאן הצפרדע תגיע?", "story": "הצפרדע על {start}, לקפוץ עוד {add}" },
     "buildTower": { "title": "בנה את המגדל" },
     "whatInRoom": { "title": "מה היה בחדר?" },
     "soundSimon": { "title": "סיימון של צלילים" },

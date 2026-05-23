@@ -47,7 +47,14 @@ import { ROUTE } from '@/constants/strings'
 import type { GameId } from '@/constants/strings'
 import { findWorldForGame } from '@/constants/worlds'
 
-const PRAISE = [PHRASE.amazing, PHRASE.wellDone, PHRASE.superStar]
+const PRAISE = [
+  PHRASE.amazing,
+  PHRASE.wellDone,
+  PHRASE.superStar,
+  PHRASE.brilliant,
+  PHRASE.keepItUp,
+  PHRASE.champion
+]
 
 export default defineComponent({
   name: 'GameShell',

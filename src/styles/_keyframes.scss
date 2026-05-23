@@ -30,6 +30,17 @@
   100% { opacity: 0;    transform: translate(0, -104vh) scale(1.15); }
 }
 
+@keyframes stroll {
+  0%   { transform: translateX(-60px); }
+  100% { transform: translateX(102vw); }
+}
+
+@keyframes waddle {
+  0%,
+  100% { transform: translateY(0) rotate(-3deg); }
+  50%  { transform: translateY(-4px) rotate(3deg); }
+}
+
 @keyframes pulse {
   0%,
   100% { transform: scale(1); }

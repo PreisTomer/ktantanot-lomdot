@@ -40,6 +40,24 @@ export function generateSubtraction(maxMinuend: number, rng: Rng): SubtractionPr
   return { a, b, answer, options: buildOptions(answer, maxMinuend, rng) }
 }
 
+export interface JumpProblem {
+  start: number
+  add: number
+  target: number
+}
+
+/**
+ * Generate a number-line addition jump: the frog starts on `start` and jumps
+ * `add` more, landing on `target` (never past `max`).
+ * @param max - the highest number on the line
+ * @param rng - injected randomness source (seed it in tests)
+ */
+export function generateJump(max: number, rng: Rng): JumpProblem {
+  const start = Math.floor(rng() * max)
+  const add = 1 + Math.floor(rng() * (max - start))
+  return { start, add, target: start + add }
+}
+
 function buildOptions(answer: number, maxSum: number, rng: Rng): number[] {
   const target = Math.min(ANSWER_OPTIONS, maxSum + 1)
   const pool = new Set<number>([answer])
