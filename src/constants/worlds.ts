@@ -8,36 +8,43 @@ import type { WorldDef } from '@/types/world'
 // so reading flows right-to-left as required.
 export const WORLDS: WorldDef[] = [
   {
-    id: WORLD_ID.LETTERS,
-    icon: ICON.LETTERS,
+    id: WORLD_ID.READING,
+    icon: ICON.BOOK,
     colorToken: 'coral',
     games: [
-      { id: GAME_ID.LETTER_FIND, icon: ICON.SEARCH },
-      { id: GAME_ID.LETTER_TRACE, icon: ICON.PENCIL }
-    ]
-  },
-  {
-    id: WORLD_ID.NUMBERS,
-    icon: ICON.NUMBERS,
-    colorToken: 'sky',
-    games: [
-      { id: GAME_ID.COUNT, icon: ICON.NUMBERS },
-      { id: GAME_ID.NUMBER_FIND, icon: ICON.SEARCH }
+      { id: GAME_ID.SYLLABLE_TRAIN, icon: ICON.TRAIN },
+      { id: GAME_ID.CATCH_WORD, icon: ICON.BALLOON },
+      { id: GAME_ID.SOUND_DETECTIVE, icon: ICON.DETECTIVE },
+      { id: GAME_ID.MAGIC_BOOK, icon: ICON.BOOK }
     ]
   },
   {
     id: WORLD_ID.MATH,
-    icon: ICON.PLUS,
+    icon: ICON.BEAR,
     colorToken: 'leaf',
     games: [
-      { id: GAME_ID.ADD, icon: ICON.PLUS },
-      { id: GAME_ID.SUBTRACT, icon: ICON.MINUS }
+      { id: GAME_ID.BEAR_RESTAURANT, icon: ICON.BEAR },
+      { id: GAME_ID.THIEF_MONKEY, icon: ICON.MONKEY },
+      { id: GAME_ID.FROG_JUMPS, icon: ICON.FROG },
+      { id: GAME_ID.BUILD_TOWER, icon: ICON.BLOCKS }
     ]
   },
   {
     id: WORLD_ID.MEMORY,
-    icon: ICON.PUZZLE,
+    icon: ICON.BELL,
     colorToken: 'grape',
-    games: [{ id: GAME_ID.MATCH_PAIRS, icon: ICON.PUZZLE }]
+    games: [
+      { id: GAME_ID.WHAT_IN_ROOM, icon: ICON.COUCH },
+      { id: GAME_ID.SOUND_SIMON, icon: ICON.BELL },
+      { id: GAME_ID.WHERE_HIDDEN, icon: ICON.BOXES },
+      { id: GAME_ID.COMPLETE_SEQUENCE, icon: ICON.PATTERN },
+      { id: GAME_ID.REMEMBER_PATH, icon: ICON.RABBIT }
+    ]
+  },
+  {
+    id: WORLD_ID.SISTERS,
+    icon: ICON.SISTERS,
+    colorToken: 'sky',
+    games: [{ id: GAME_ID.SISTERS_MISSION, icon: ICON.SISTERS }]
   }
 ]

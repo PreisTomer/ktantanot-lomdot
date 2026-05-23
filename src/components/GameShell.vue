@@ -1,7 +1,7 @@
 <!-- Copyright © 2026 Tomer Preis. Licensed under the MIT License. -->
 <template>
   <section class="shell">
-    <GameHeader :title="title" :prompt="prompt" />
+    <GameHeader :title="title" :prompt="prompt" :parts="speechParts" />
     <ProgressDots class="shell__dots" :total="rounds" :current="current - 1" />
 
     <div v-if="isFinished" class="shell__finish">
@@ -22,6 +22,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
 
 import { audio } from '@/services/audio'
 
@@ -47,6 +48,10 @@ export default defineComponent({
       type: String,
       required: true
     },
+    speechParts: {
+      type: Array as PropType<string[]>,
+      default: () => []
+    },
     rounds: {
       type: Number,
       required: true
@@ -65,20 +70,30 @@ export default defineComponent({
   computed: {
     icon() {
       return ICON
+    },
+    announceKey(): string {
+      return this.speechParts.length > 0 ? this.speechParts.join('|') : this.prompt
     }
   },
   watch: {
-    prompt(text: string) {
-      if (!this.isFinished) audio.speak(text)
+    announceKey() {
+      if (!this.isFinished) this.announce()
     }
   },
   mounted() {
-    audio.speak(this.prompt)
+    this.announce()
   },
   beforeUnmount() {
     if (this.rewardTimer) clearTimeout(this.rewardTimer)
   },
   methods: {
+    announce() {
+      if (this.speechParts.length > 0) {
+        audio.speakParts(this.speechParts)
+        return
+      }
+      audio.speak(this.prompt)
+    },
     submit(isCorrect: boolean) {
       if (this.isBusy || this.isFinished) return
       if (!isCorrect) {

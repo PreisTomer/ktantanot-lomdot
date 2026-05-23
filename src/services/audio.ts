@@ -15,6 +15,21 @@ class AudioService {
     const synth = this.synth
     if (!synth) return
     synth.cancel()
+    this.enqueue(synth, text)
+  }
+
+  // Speak each part as its own utterance, giving a natural pause between them
+  // (e.g. an instruction followed by the target spoken clearly on its own).
+  speakParts(parts: string[]): void {
+    const synth = this.synth
+    if (!synth) return
+    synth.cancel()
+    for (const part of parts) {
+      this.enqueue(synth, part)
+    }
+  }
+
+  private enqueue(synth: SpeechSynthesis, text: string): void {
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = SPEECH_LANG
     utterance.rate = SPEECH_RATE

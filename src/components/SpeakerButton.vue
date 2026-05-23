@@ -7,6 +7,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
 
 import { audio } from '@/services/audio'
 
@@ -18,6 +19,10 @@ export default defineComponent({
     text: {
       type: String,
       required: true
+    },
+    parts: {
+      type: Array as PropType<string[]>,
+      default: () => []
     }
   },
   computed: {
@@ -27,6 +32,10 @@ export default defineComponent({
   },
   methods: {
     repeat() {
+      if (this.parts.length > 0) {
+        audio.speakParts(this.parts)
+        return
+      }
       audio.speak(this.text)
     }
   }

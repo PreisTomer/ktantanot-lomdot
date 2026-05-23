@@ -3,12 +3,13 @@
   <header class="game-header">
     <BackButton />
     <h1 class="game-header__title">{{ title }}</h1>
-    <SpeakerButton :text="prompt" />
+    <SpeakerButton :text="prompt" :parts="parts" />
   </header>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
 
 import BackButton from '@/components/BackButton.vue'
 import SpeakerButton from '@/components/SpeakerButton.vue'
@@ -24,6 +25,10 @@ export default defineComponent({
     prompt: {
       type: String,
       required: true
+    },
+    parts: {
+      type: Array as PropType<string[]>,
+      default: () => []
     }
   }
 })

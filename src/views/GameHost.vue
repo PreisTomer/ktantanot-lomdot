@@ -7,35 +7,36 @@
 import { defineComponent } from 'vue'
 import type { Component } from 'vue'
 
-import FindGame from '@/components/games/FindGame.vue'
-import MathGame from '@/components/games/MathGame.vue'
-import CountGame from '@/components/games/CountGame.vue'
-import LetterTraceGame from '@/components/games/LetterTraceGame.vue'
-import MatchPairsGame from '@/components/games/MatchPairsGame.vue'
+import SyllableTrainGame from '@/components/games/SyllableTrain/index.vue'
+import ComingSoonGame from '@/components/games/ComingSoonGame.vue'
 
-import { HEBREW_LETTERS, NUMBERS } from '@/constants/alphabet'
 import { GAME_ID, ROUTE } from '@/constants/strings'
 import type { GameId } from '@/constants/strings'
 
 interface GameEntry {
   is: Component
-  props: Record<string, string | string[]>
+  props: Record<string, string>
+}
+
+function comingSoon(id: GameId): GameEntry {
+  return { is: ComingSoonGame, props: { titleKey: `games.${id}.title` } }
 }
 
 const REGISTRY: Record<GameId, GameEntry> = {
-  [GAME_ID.LETTER_FIND]: {
-    is: FindGame,
-    props: { pool: [...HEBREW_LETTERS], baseKey: 'games.letterFind', paramName: 'letter' }
-  },
-  [GAME_ID.NUMBER_FIND]: {
-    is: FindGame,
-    props: { pool: NUMBERS, baseKey: 'games.numberFind', paramName: 'number' }
-  },
-  [GAME_ID.COUNT]: { is: CountGame, props: {} },
-  [GAME_ID.ADD]: { is: MathGame, props: { mode: 'add' } },
-  [GAME_ID.SUBTRACT]: { is: MathGame, props: { mode: 'subtract' } },
-  [GAME_ID.LETTER_TRACE]: { is: LetterTraceGame, props: {} },
-  [GAME_ID.MATCH_PAIRS]: { is: MatchPairsGame, props: {} }
+  [GAME_ID.SYLLABLE_TRAIN]: { is: SyllableTrainGame, props: {} },
+  [GAME_ID.CATCH_WORD]: comingSoon(GAME_ID.CATCH_WORD),
+  [GAME_ID.SOUND_DETECTIVE]: comingSoon(GAME_ID.SOUND_DETECTIVE),
+  [GAME_ID.MAGIC_BOOK]: comingSoon(GAME_ID.MAGIC_BOOK),
+  [GAME_ID.BEAR_RESTAURANT]: comingSoon(GAME_ID.BEAR_RESTAURANT),
+  [GAME_ID.THIEF_MONKEY]: comingSoon(GAME_ID.THIEF_MONKEY),
+  [GAME_ID.FROG_JUMPS]: comingSoon(GAME_ID.FROG_JUMPS),
+  [GAME_ID.BUILD_TOWER]: comingSoon(GAME_ID.BUILD_TOWER),
+  [GAME_ID.WHAT_IN_ROOM]: comingSoon(GAME_ID.WHAT_IN_ROOM),
+  [GAME_ID.SOUND_SIMON]: comingSoon(GAME_ID.SOUND_SIMON),
+  [GAME_ID.WHERE_HIDDEN]: comingSoon(GAME_ID.WHERE_HIDDEN),
+  [GAME_ID.COMPLETE_SEQUENCE]: comingSoon(GAME_ID.COMPLETE_SEQUENCE),
+  [GAME_ID.REMEMBER_PATH]: comingSoon(GAME_ID.REMEMBER_PATH),
+  [GAME_ID.SISTERS_MISSION]: comingSoon(GAME_ID.SISTERS_MISSION)
 }
 
 export default defineComponent({

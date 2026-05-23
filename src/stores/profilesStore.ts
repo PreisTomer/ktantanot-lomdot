@@ -8,8 +8,8 @@ import type { Profile, Profiles } from '@/types/profile'
 // Pre-readers identify themselves by avatar and colour, not by a written name.
 function seedProfiles(): Profiles {
   return [
-    { id: 'one', avatar: ICON.UNICORN, colorToken: 'coral' },
-    { id: 'two', avatar: ICON.BUTTERFLY, colorToken: 'grape' }
+    { id: 'one', avatar: ICON.RABBIT, colorToken: 'coral' },
+    { id: 'two', avatar: ICON.BEAR, colorToken: 'grape' }
   ]
 }
 

@@ -9,6 +9,10 @@ export const STARS_PER_CORRECT = 1
 export const MASTERY_WEIGHT_FLOOR = 0.1
 
 export const ROUNDS_PER_SESSION = 5
+export const SYLLABLE_ROUNDS = 6
+export const TRAIN_SCENE_W = 900
+export const TRAIN_SCENE_H = 460
+export const TRAIN_CAR = 96
 export const REWARD_DURATION_MS = 1500
 export const WRONG_FEEDBACK_MS = 600
 export const COUNT_MAX = 10
@@ -18,5 +22,5 @@ export const MATCH_PAIRS = 4
 export const FLIP_BACK_MS = 900
 
 export const SPEECH_LANG = 'he-IL'
-export const SPEECH_RATE = 0.9
+export const SPEECH_RATE = 0.75
 export const SPEECH_PITCH = 1.1

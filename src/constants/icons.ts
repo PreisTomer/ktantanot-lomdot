@@ -5,17 +5,24 @@ export const ICON = {
   HEART: '❤️',
   SPEAKER: '🔊',
   HOME: '🏠',
-  SEARCH: '🔍',
-  PENCIL: '✏️',
-  PLUS: '➕',
-  MINUS: '➖',
-  PUZZLE: '🧩',
-  NUMBERS: '🔢',
-  LETTERS: 'א',
-  UNICORN: '🦄',
-  BUTTERFLY: '🦋',
-  CAT: '🐱',
-  RABBIT: '🐰'
+  // Reading
+  TRAIN: '🚂',
+  BALLOON: '🎈',
+  DETECTIVE: '🕵️',
+  BOOK: '📖',
+  // Math
+  BEAR: '🐻',
+  MONKEY: '🐵',
+  FROG: '🐸',
+  BLOCKS: '🧱',
+  // Memory
+  COUCH: '🛋️',
+  BELL: '🔔',
+  BOXES: '📦',
+  PATTERN: '🍎',
+  RABBIT: '🐰',
+  // Shared
+  SISTERS: '👭'
 } as const
 
 export type IconKey = keyof typeof ICON

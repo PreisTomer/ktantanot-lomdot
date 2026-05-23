@@ -22,6 +22,26 @@ export const COLOR = {
   white: '#ffffff'
 } as const
 
+// Scene colours for procedural Pixi rendering (canvas can't read CSS vars).
+export const SCENE = {
+  skyTop: '#bdeaff',
+  skyBottom: '#eaf9ff',
+  sun: '#ffd60a',
+  hillFar: '#bfe8b0',
+  hillNear: '#80ed99',
+  grass: '#5fce7a',
+  rail: '#8a6d52',
+  tie: '#6b5947',
+  trainBody: '#ff6b9d',
+  trainRoof: '#e5446d',
+  trainCar: '#48cae4',
+  trainCarAlt: '#c77dff',
+  wheel: '#3a2e2a',
+  steam: '#ffffff',
+  carEmpty: '#ffe8c2',
+  letterInk: '#3a2e2a'
+} as const
+
 // Confetti / reward bursts draw from the full bright palette.
 export const CONFETTI_COLORS: readonly string[] = [
   COLOR.primary,

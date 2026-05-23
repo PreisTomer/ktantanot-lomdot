@@ -1,17 +1,24 @@
 {
   "games": {
-    "letterFind": { "title": "מצאי אות", "prompt": "מצאי את האות {letter}" },
-    "letterTrace": {
-      "title": "כתיבת אותיות",
-      "prompt": "נכתוב את האות {letter}, עקבי עם האצבע",
-      "clear": "מחקי",
-      "done": "סיימתי"
+    "syllableTrain": {
+      "title": "רכבת ההברות",
+      "prompt": "איזו אות חסרה במילה?",
+      "instruction": "איזו אות חסרה כדי שהרכבת תיסע?"
     },
-    "count": { "title": "ספירה", "prompt": "ספרי כמה יש, ואז בחרי את המספר" },
-    "numberFind": { "title": "מצאי מספר", "prompt": "מצאי את המספר {number}" },
-    "add": { "title": "חיבור", "prompt": "כמה זה {a} ועוד {b}?" },
-    "subtract": { "title": "חיסור", "prompt": "כמה זה {a} פחות {b}?" },
-    "matchPairs": { "title": "זוגות", "prompt": "מצאי את הזוגות המתאימים" },
+    "catchWord": { "title": "תפסי את המילה" },
+    "soundDetective": { "title": "הבלשית" },
+    "magicBook": { "title": "ספר הקסם" },
+    "bearRestaurant": { "title": "המסעדה של הדוב" },
+    "thiefMonkey": { "title": "הקוף הגנב" },
+    "frogJumps": { "title": "קפיצות צפרדע" },
+    "buildTower": { "title": "בנה את המגדל" },
+    "whatInRoom": { "title": "מה היה בחדר?" },
+    "soundSimon": { "title": "סיימון של צלילים" },
+    "whereHidden": { "title": "איפה הסתתר?" },
+    "completeSequence": { "title": "השלם את הרצף" },
+    "rememberPath": { "title": "זכור את המסלול" },
+    "sistersMission": { "title": "משימת האחיות" },
+    "comingSoon": "המשחק הזה כמעט מוכן, בקרוב נשחק בו!",
     "finished": "כל הכבוד! סיימת את כל המשחק!",
     "playAgain": "עוד פעם"
   }

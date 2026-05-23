@@ -1,22 +1,33 @@
 // Copyright © 2026 Tomer Preis. Licensed under the MIT License.
 
 export const WORLD_ID = {
-  LETTERS: 'letters',
-  NUMBERS: 'numbers',
+  READING: 'reading',
   MATH: 'math',
-  MEMORY: 'memory'
+  MEMORY: 'memory',
+  SISTERS: 'sisters'
 } as const
 
 export type WorldId = (typeof WORLD_ID)[keyof typeof WORLD_ID]
 
 export const GAME_ID = {
-  LETTER_FIND: 'letterFind',
-  LETTER_TRACE: 'letterTrace',
-  COUNT: 'count',
-  NUMBER_FIND: 'numberFind',
-  ADD: 'add',
-  SUBTRACT: 'subtract',
-  MATCH_PAIRS: 'matchPairs'
+  // Reading
+  SYLLABLE_TRAIN: 'syllableTrain',
+  CATCH_WORD: 'catchWord',
+  SOUND_DETECTIVE: 'soundDetective',
+  MAGIC_BOOK: 'magicBook',
+  // Math
+  BEAR_RESTAURANT: 'bearRestaurant',
+  THIEF_MONKEY: 'thiefMonkey',
+  FROG_JUMPS: 'frogJumps',
+  BUILD_TOWER: 'buildTower',
+  // Memory
+  WHAT_IN_ROOM: 'whatInRoom',
+  SOUND_SIMON: 'soundSimon',
+  WHERE_HIDDEN: 'whereHidden',
+  COMPLETE_SEQUENCE: 'completeSequence',
+  REMEMBER_PATH: 'rememberPath',
+  // Shared
+  SISTERS_MISSION: 'sistersMission'
 } as const
 
 export type GameId = (typeof GAME_ID)[keyof typeof GAME_ID]
