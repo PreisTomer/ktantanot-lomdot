@@ -1,0 +1,111 @@
+/* Copyright © 2026 Tomer Preis. Licensed under the MIT License. */
+
+:root {
+  /* Brand + world colours (bright, warm, friendly for young kids) */
+  --color-primary: #ffb703;      /* sunny yellow  */
+  --color-primary-deep: #fb8500; /* orange        */
+  --color-sky: #48cae4;          /* numbers world */
+  --color-sky-deep: #0096c7;
+  --color-coral: #ff6b9d;        /* letters world */
+  --color-coral-deep: #e5446d;
+  --color-leaf: #80ed99;         /* math world    */
+  --color-leaf-deep: #38b000;
+  --color-grape: #c77dff;        /* memory world  */
+  --color-grape-deep: #9d4edd;
+  --color-sun: #ffd60a;
+
+  --color-correct: #38b000;
+  --color-retry: #ff9e00;
+
+  /* Surfaces + ink */
+  --color-bg: #fff7e6;           /* soft cream sky */
+  --color-bg-2: #ffe8c2;
+  --color-surface: #ffffff;
+  --color-ink: #3a2e2a;          /* warm dark brown */
+  --color-ink-soft: #6b5b54;
+  --color-white: #ffffff;
+
+  /* Font sizes — deliberately large; kids need big readable text */
+  --fs-xs: 1rem;
+  --fs-sm: 1.25rem;
+  --fs-md: 1.6rem;
+  --fs-lg: 2.2rem;
+  --fs-xl: 3.5rem;
+  --fs-display: 6rem;            /* huge letter/number tiles */
+
+  /* Spacing */
+  --sp-xs: 0.4rem;
+  --sp-sm: 0.8rem;
+  --sp-md: 1.4rem;
+  --sp-lg: 2.4rem;
+  --sp-xl: 4rem;
+
+  /* Touch target floor */
+  --touch-min: 64px;
+
+  /* Opacity */
+  --op-ghost: 0.35;
+  --op-muted: 0.6;
+  --op-strong: 0.9;
+
+  /* Transitions + spring easing */
+  --tr-fast: 0.15s ease;
+  --tr-normal: 0.25s ease;
+  --tr-slow: 0.4s ease;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Radius */
+  --radius: 18px;
+  --radius-lg: 32px;
+  --radius-pill: 999px;
+
+  /* Letter spacing */
+  --ls-wide: 0.06em;
+
+  /* Shadows (soft, toy-like) */
+  --shadow-card: 0 10px 0 rgba(0, 0, 0, 0.08), 0 16px 30px rgba(0, 0, 0, 0.12);
+  --shadow-press: 0 4px 0 rgba(0, 0, 0, 0.08);
+
+  --font-rounded: 'Varela Round', 'Rubik', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-rounded);
+  color: var(--color-ink);
+  background: var(--color-bg);
+  font-size: var(--fs-md);
+  /* kids should not be able to text-select / long-press menu */
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
