@@ -66,11 +66,18 @@ export default defineComponent({
     handlePick(slot: number) {
       const isCorrect = slot === this.round.ballSlot
       this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, 'cup', isCorrect)
-      this.scene?.reveal(slot, this.round.ballSlot)
-      // Let the reveal play before the reward/feedback fires.
+      if (!isCorrect) {
+        // Peek the empty cup and let them try again (no advance, no reveal).
+        this.scene?.peekEmpty(slot)
+        const shell = this.$refs.shell as InstanceType<typeof GameShell> | undefined
+        shell?.submit(false)
+        return
+      }
+      this.scene?.revealWin(slot)
+      // Let the reveal play before the reward fires.
       window.setTimeout(() => {
         const shell = this.$refs.shell as InstanceType<typeof GameShell> | undefined
-        shell?.submit(isCorrect)
+        shell?.submit(true)
       }, 700)
     }
   }
