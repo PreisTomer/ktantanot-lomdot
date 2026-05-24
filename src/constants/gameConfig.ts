@@ -41,7 +41,7 @@ export const BEAR_MAX_SUM = 10
 export const BEAR_SCENE_W = 900
 export const BEAR_SCENE_H = 560
 
-export const COMPLETE_ROUNDS = 6
+export const COMPLETE_ROUNDS = 7
 export const COMPLETE_OPTIONS = 4
 export const COMPLETE_SCENE_W = 900
 export const COMPLETE_SCENE_H = 420

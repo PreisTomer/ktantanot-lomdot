@@ -4,6 +4,12 @@
     <GameHeader :title="title" :prompt="prompt" :parts="speechParts" />
     <ProgressDots class="shell__dots" :total="rounds" :current="completedRounds" />
 
+    <!-- The body stays mounted so its <canvas>/Pixi scene survives "play again";
+         the finish screen is an overlay on top, not a replacement. -->
+    <div class="shell__body">
+      <slot :submit="submit" :isBusy="isBusy" />
+    </div>
+
     <div v-if="isFinished" class="shell__finish">
       <p class="shell__finish-text">{{ $t('games.finished') }}</p>
       <div class="shell__actions">
@@ -20,10 +26,6 @@
           <span>{{ $t('games.anotherWorld') }}</span>
         </button>
       </div>
-    </div>
-
-    <div v-else class="shell__body">
-      <slot :submit="submit" :isBusy="isBusy" />
     </div>
 
     <RewardOverlay v-if="isShowingReward" />
@@ -173,6 +175,7 @@ export default defineComponent({
 @use '@/styles/mixins' as *;
 
 .shell {
+  position: relative;
   inline-size: 100%;
   max-inline-size: 60rem;
 
@@ -188,8 +191,16 @@ export default defineComponent({
 
   &__finish {
     @include flex-column-center;
+    position: absolute;
+    inset: 0;
+    z-index: 6;
     gap: var(--sp-lg);
+    padding: var(--sp-lg);
     text-align: center;
+    background: color-mix(in srgb, var(--color-bg) 86%, transparent);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border-radius: var(--radius-lg);
   }
 
   &__finish-text {
