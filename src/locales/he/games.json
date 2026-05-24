@@ -14,7 +14,7 @@
     "buildTower": { "title": "בנה את המגדל", "prompt": "לבנות את המגדל מהקטן לגדול", "instruction": "לסדר את הקוביות מהקטן לגדול" },
     "whatInRoom": { "title": "מה היה בחדר?", "study": "להסתכל טוב מה יש בחדר", "recall": "מה נעלם מהחדר?" },
     "soundSimon": { "title": "סיימון של צלילים", "prompt": "להקשיב לצלילים ולחזור עליהם" },
-    "whereHidden": { "title": "איפה הסתתר?" },
+    "whereHidden": { "title": "איפה הסתתר?", "prompt": "עקבו אחרי הכדור, איפה הוא מסתתר?", "instruction": "לעקוב אחרי הכדור" },
     "completeSequence": { "title": "השלם את הרצף", "prompt": "מה בא עכשיו ברצף?", "instruction": "להשלים את הרצף, מה ממשיך אותו?" },
     "rememberPath": { "title": "זכור את המסלול" },
     "sistersMission": { "title": "משימת האחיות" },
