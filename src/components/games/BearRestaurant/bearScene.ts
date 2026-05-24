@@ -16,10 +16,11 @@ const DESK_BOTTOM = '#ffe2c2'
 const BANDS = 12
 const PLATE_X = BEAR_SCENE_W / 2
 const PLATE_Y = BEAR_SCENE_H * 0.72
-const PLATE_RX = 170
-const PER_ROW = 4
-const CAKE_GAP_X = 42
-const CAKE_GAP_Y = 30
+const PLATE_RX = 200
+const CAKE_GAP_X = 46
+const CAKE_SIZE = 38
+// Each addend gets its own row, offset above/below the plate centre.
+const ROW_DY = 28
 
 // המסעדה של הדוב scene: the two cake groups fly onto the bear's plate by
 // themselves (the first group, then the second), showing the addition; the
@@ -97,41 +98,33 @@ export class BearScene {
     if (this.equation) this.equation.text = `${a} + ${b} = ?`
     if (!this.app) return
 
-    const total = a + b
-    const positions = this.platePositions(total)
-    positions.forEach((target, index) => {
-      const fromLeft = index < a
-      const cake = new Text({ text: '🧁', style: { fontFamily: FONT, fontSize: 40 } })
+    // The first addend is always the top row, the second the bottom row, so the
+    // two groups in the equation map one-to-one to the two rows of cakes.
+    this.spawnRow(a, PLATE_Y - ROW_DY, true, 0)
+    this.spawnRow(b, PLATE_Y + ROW_DY, false, a * 0.12 + 0.35)
+  }
+
+  // Fly `count` cakes into a single centred row at `y`; the first group enters
+  // from the left, the second from the right, so the addition reads as combining.
+  private spawnRow(count: number, y: number, fromLeft: boolean, baseDelay: number): void {
+    const usable = (PLATE_RX - 24) * 2
+    const gap = count > 1 ? Math.min(CAKE_GAP_X, usable / (count - 1)) : 0
+    for (let i = 0; i < count; i++) {
+      const targetX = PLATE_X + (i - (count - 1) / 2) * gap
+      const cake = new Text({ text: '🧁', style: { fontFamily: FONT, fontSize: CAKE_SIZE } })
       cake.anchor.set(0.5)
-      cake.position.set(fromLeft ? -60 : BEAR_SCENE_W + 60, target.y)
+      cake.position.set(fromLeft ? -60 : BEAR_SCENE_W + 60, y)
       this.app?.stage.addChild(cake)
       this.cakes.push(cake)
-      // Group A flies in first, then group B, so the combining reads clearly.
-      const order = fromLeft ? index : index - a
-      const delay = (fromLeft ? 0 : a * 0.12 + 0.35) + order * 0.12
       const tween: Anim = gsap.to(cake, {
-        x: target.x,
+        x: targetX,
         duration: 0.45,
-        delay,
+        delay: baseDelay + i * 0.12,
         ease: 'back.out(1.4)',
         onComplete: () => this.endTween(tween)
       })
       this.track(tween)
-    })
-  }
-
-  private platePositions(total: number): { x: number; y: number }[] {
-    const rows = Math.ceil(total / PER_ROW)
-    const positions: { x: number; y: number }[] = []
-    for (let i = 0; i < total; i++) {
-      const row = Math.floor(i / PER_ROW)
-      const colCount = Math.min(PER_ROW, total - row * PER_ROW)
-      const col = i % PER_ROW
-      const x = PLATE_X + (col - (colCount - 1) / 2) * CAKE_GAP_X
-      const y = PLATE_Y - 6 - (rows - 1 - row) * CAKE_GAP_Y
-      positions.push({ x, y })
     }
-    return positions
   }
 
   cheer(): void {
