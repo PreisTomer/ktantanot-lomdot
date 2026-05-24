@@ -25,11 +25,11 @@ playable; the rest show `ComingSoonGame` with a "בקרוב" badge.
 - [x] **מה היה בחדר?** — study a shelf, then pick what disappeared
 - [x] **סיימון של צלילים** — repeat a growing sequence of sound pads
 - [x] **השלם את הרצף** — complete the repeating pattern (tap what comes next)
+- [x] **איפה הסתתר?** — shell game: watch the ball, track it through the shuffle
 
 ## Remaining
 
 ### זיכרון (memory)
-- [ ] **איפה הסתתר?** — cup-shuffle; track where the ball hid
 - [ ] **זכור את המסלול** — repeat the rabbit's path (right→left→up)
 
 ### משימת האחיות (shared, two players)
