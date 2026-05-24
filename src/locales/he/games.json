@@ -15,7 +15,7 @@
     "whatInRoom": { "title": "מה היה בחדר?", "study": "להסתכל טוב מה יש בחדר", "recall": "מה נעלם מהחדר?" },
     "soundSimon": { "title": "סיימון של צלילים", "prompt": "להקשיב לצלילים ולחזור עליהם" },
     "whereHidden": { "title": "איפה הסתתר?" },
-    "completeSequence": { "title": "השלם את הרצף" },
+    "completeSequence": { "title": "השלם את הרצף", "prompt": "מה בא עכשיו ברצף?", "instruction": "להשלים את הרצף, מה ממשיך אותו?" },
     "rememberPath": { "title": "זכור את המסלול" },
     "sistersMission": { "title": "משימת האחיות" },
     "comingSoon": "המשחק הזה כמעט מוכן, בקרוב נשחק בו!",

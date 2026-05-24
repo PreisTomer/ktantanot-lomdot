@@ -9,26 +9,27 @@ playable; the rest show `ComingSoonGame` with a "בקרוב" badge.
 
 ## Done
 
+### קריאה (reading)
 - [x] **רכבת ההברות** — syllable train: complete the missing letter of a word
-- [x] **תפסי את המילה** — catch the word: pop the balloon matching the picture/word
+- [x] **תפסי את המילה** — catch the balloon matching the picture/word
 - [x] **הבלשית שמחפשת צליל** — find the word that starts with the target letter
+- [x] **ספר הקסם** — magic book: tap a word and it comes to life
+
+### חשבון (math)
+- [x] **המסעדה של הדוב** — cakes auto-combine on the plate; tap the sum
+- [x] **הקוף הגנב** — monkey steals bananas (remainder hidden); solve the subtraction
+- [x] **קפיצות צפרדע** — frog hops a number line to add (tap the landing)
+- [x] **בנה את המגדל** — stack scrambled numbered blocks small→large
+
+### זיכרון (memory)
+- [x] **מה היה בחדר?** — study a shelf, then pick what disappeared
+- [x] **סיימון של צלילים** — repeat a growing sequence of sound pads
+- [x] **השלם את הרצף** — complete the repeating pattern (tap what comes next)
 
 ## Remaining
 
-### קריאה (reading)
-- [ ] **ספר הקסם** — interactive story; tapping a word animates its meaning
-
-### חשבון (math)
-- [x] **הקוף הגנב** — monkey steals bananas from the tree; solve the subtraction
-- [x] **קפיצות צפרדע** — frog hops along a number line to add (tap the landing)
-- [ ] **המסעדה של הדוב** — drag cakes to the plate to add (2 + 3)
-- [ ] **בנה את המגדל** — each correct answer stacks another block
-
 ### זיכרון (memory)
-- [ ] **מה היה בחדר?** — view a room, then recall what was in it
-- [ ] **סיימון של צלילים** — repeat a growing sequence of sounds
 - [ ] **איפה הסתתר?** — cup-shuffle; track where the ball hid
-- [ ] **השלם את הרצף** — complete the pattern (🍎🍌🍎🍌__)
 - [ ] **זכור את המסלול** — repeat the rabbit's path (right→left→up)
 
 ### משימת האחיות (shared, two players)

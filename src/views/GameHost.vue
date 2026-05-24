@@ -17,6 +17,7 @@ import BearRestaurantGame from '@/components/games/BearRestaurant/index.vue'
 import BuildTowerGame from '@/components/games/BuildTower/index.vue'
 import WhatInRoomGame from '@/components/games/WhatInRoom/index.vue'
 import SoundSimonGame from '@/components/games/SoundSimon/index.vue'
+import CompleteSequenceGame from '@/components/games/CompleteSequence/index.vue'
 import ComingSoonGame from '@/components/games/ComingSoonGame.vue'
 
 import { GAME_ID, ROUTE } from '@/constants/strings'
@@ -43,7 +44,7 @@ const REGISTRY: Record<GameId, GameEntry> = {
   [GAME_ID.WHAT_IN_ROOM]: { is: WhatInRoomGame, props: {} },
   [GAME_ID.SOUND_SIMON]: { is: SoundSimonGame, props: {} },
   [GAME_ID.WHERE_HIDDEN]: comingSoon(GAME_ID.WHERE_HIDDEN),
-  [GAME_ID.COMPLETE_SEQUENCE]: comingSoon(GAME_ID.COMPLETE_SEQUENCE),
+  [GAME_ID.COMPLETE_SEQUENCE]: { is: CompleteSequenceGame, props: {} },
   [GAME_ID.REMEMBER_PATH]: comingSoon(GAME_ID.REMEMBER_PATH),
   [GAME_ID.SISTERS_MISSION]: comingSoon(GAME_ID.SISTERS_MISSION)
 }
