@@ -1,9 +1,13 @@
 // Copyright © 2026 Tomer Preis. Licensed under the MIT License.
 
 import { SPEECH_LANG, SPEECH_PITCH, SPEECH_RATE } from '@/constants/gameConfig'
+import { AUDIO_CLIPS } from '@/constants/audioClips'
 import type { Phrase } from '@/constants/phrases'
 
 class AudioService {
+  private current: HTMLAudioElement | null = null
+  private sequenceToken = 0
+
   private get synth(): SpeechSynthesis | null {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       return null
@@ -11,22 +15,78 @@ class AudioService {
     return window.speechSynthesis
   }
 
+  private clipUrl(text: string): string | null {
+    const path = AUDIO_CLIPS[text.trim()]
+    return path ? import.meta.env.BASE_URL + path : null
+  }
+
   speak(text: string): void {
+    this.stop()
+    const url = this.clipUrl(text)
+    if (url) {
+      this.playSequence([url])
+      return
+    }
     const synth = this.synth
-    if (!synth) return
-    synth.cancel()
-    this.enqueue(synth, text)
+    if (synth) this.enqueue(synth, text)
   }
 
   // Speak each part as its own utterance, giving a natural pause between them
   // (e.g. an instruction followed by the target spoken clearly on its own).
+  // Pre-rendered clips are chained only when every part has one; a single miss
+  // falls back to Web Speech for the whole sequence so the cadence stays even.
   speakParts(parts: string[]): void {
+    this.stop()
+    const urls = parts.map((part) => this.clipUrl(part))
+    if (urls.every((url): url is string => url !== null)) {
+      this.playSequence(urls)
+      return
+    }
     const synth = this.synth
     if (!synth) return
-    synth.cancel()
-    for (const part of parts) {
-      this.enqueue(synth, part)
+    for (const part of parts) this.enqueue(synth, part)
+  }
+
+  playPhrase(phrase: Phrase): void {
+    if (phrase.audioFile) {
+      this.stop()
+      this.playSequence([phrase.audioFile])
+      return
     }
+    this.speak(phrase.text)
+  }
+
+  stop(): void {
+    this.sequenceToken++
+    this.synth?.cancel()
+    if (this.current) {
+      this.current.pause()
+      this.current = null
+    }
+  }
+
+  isSpeaking(): boolean {
+    const synth = this.synth
+    if (synth && (synth.speaking || synth.pending)) return true
+    return !!this.current && !this.current.paused && !this.current.ended
+  }
+
+  private playSequence(urls: string[]): void {
+    const token = ++this.sequenceToken
+    let index = 0
+    const playNext = () => {
+      if (token !== this.sequenceToken) return
+      if (index >= urls.length) {
+        this.current = null
+        return
+      }
+      const element = new Audio(urls[index++])
+      this.current = element
+      element.onended = playNext
+      element.onerror = playNext
+      void element.play().catch(() => playNext())
+    }
+    playNext()
   }
 
   private enqueue(synth: SpeechSynthesis, text: string): void {
@@ -35,23 +95,6 @@ class AudioService {
     utterance.rate = SPEECH_RATE
     utterance.pitch = SPEECH_PITCH
     synth.speak(utterance)
-  }
-
-  playPhrase(phrase: Phrase): void {
-    if (phrase.audioFile) {
-      void new Audio(phrase.audioFile).play().catch(() => this.speak(phrase.text))
-      return
-    }
-    this.speak(phrase.text)
-  }
-
-  stop(): void {
-    this.synth?.cancel()
-  }
-
-  isSpeaking(): boolean {
-    const synth = this.synth
-    return !!synth && (synth.speaking || synth.pending)
   }
 }
 

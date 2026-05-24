@@ -14,6 +14,9 @@ import MagicBookGame from '@/components/games/MagicBook/index.vue'
 import ThiefMonkeyGame from '@/components/games/ThiefMonkey/index.vue'
 import FrogJumpsGame from '@/components/games/FrogJumps/index.vue'
 import BearRestaurantGame from '@/components/games/BearRestaurant/index.vue'
+import BuildTowerGame from '@/components/games/BuildTower/index.vue'
+import WhatInRoomGame from '@/components/games/WhatInRoom/index.vue'
+import SoundSimonGame from '@/components/games/SoundSimon/index.vue'
 import ComingSoonGame from '@/components/games/ComingSoonGame.vue'
 
 import { GAME_ID, ROUTE } from '@/constants/strings'
@@ -36,9 +39,9 @@ const REGISTRY: Record<GameId, GameEntry> = {
   [GAME_ID.BEAR_RESTAURANT]: { is: BearRestaurantGame, props: {} },
   [GAME_ID.THIEF_MONKEY]: { is: ThiefMonkeyGame, props: {} },
   [GAME_ID.FROG_JUMPS]: { is: FrogJumpsGame, props: {} },
-  [GAME_ID.BUILD_TOWER]: comingSoon(GAME_ID.BUILD_TOWER),
-  [GAME_ID.WHAT_IN_ROOM]: comingSoon(GAME_ID.WHAT_IN_ROOM),
-  [GAME_ID.SOUND_SIMON]: comingSoon(GAME_ID.SOUND_SIMON),
+  [GAME_ID.BUILD_TOWER]: { is: BuildTowerGame, props: {} },
+  [GAME_ID.WHAT_IN_ROOM]: { is: WhatInRoomGame, props: {} },
+  [GAME_ID.SOUND_SIMON]: { is: SoundSimonGame, props: {} },
   [GAME_ID.WHERE_HIDDEN]: comingSoon(GAME_ID.WHERE_HIDDEN),
   [GAME_ID.COMPLETE_SEQUENCE]: comingSoon(GAME_ID.COMPLETE_SEQUENCE),
   [GAME_ID.REMEMBER_PATH]: comingSoon(GAME_ID.REMEMBER_PATH),

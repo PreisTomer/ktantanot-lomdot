@@ -92,3 +92,20 @@
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+// Expanding ring shockwave behind a reward star.
+@keyframes shockwave {
+  0%   { opacity: 0.55; transform: scale(0.2); }
+  100% { opacity: 0;    transform: scale(2.6); }
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+// Soft breathing glow halo.
+@keyframes glow-pulse {
+  0%,
+  100% { opacity: 0.35; transform: scale(1); }
+  50%  { opacity: 0.7;  transform: scale(1.12); }
+}

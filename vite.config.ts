@@ -11,6 +11,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,mp3}']
+      },
       manifest: {
         name: 'קטנטנות לומדות',
         short_name: 'קטנטנות',

@@ -12,9 +12,10 @@
         <canvas ref="stage" class="bear__stage"></canvas>
         <div class="bear__options">
           <OptionTile
-            v-for="option in optionLabels"
+            v-for="(option, i) in optionLabels"
             :key="option"
             :label="option"
+            :tone="tones[i % tones.length]"
             :shake="option === wrongValue"
             :disabled="isBusy"
             @pick="(value: string) => handlePick(value, submit)"
@@ -37,6 +38,8 @@ import OptionTile from '@/components/OptionTile.vue'
 import { generateAddition } from '@/utils/arithmetic'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
+
+import { TILE_TONES } from '@/theme/colors'
 
 import { BEAR_MAX_SUM, BEAR_ROUNDS } from '@/constants/gameConfig'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
@@ -67,6 +70,9 @@ export default defineComponent({
     },
     optionLabels(): string[] {
       return this.options.map((option) => String(option))
+    },
+    tones(): readonly string[] {
+      return TILE_TONES
     },
     speechParts(): string[] {
       return [this.$t('games.bearRestaurant.story', { a: this.a, b: this.b }), this.$t('games.bearRestaurant.prompt')]

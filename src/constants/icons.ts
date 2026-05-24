@@ -3,6 +3,7 @@
 export const ICON = {
   STAR: '⭐',
   HEART: '❤️',
+  SPARKLE: '✨',
   SPEAKER: '🔊',
   HOME: '🏠',
   // Reading

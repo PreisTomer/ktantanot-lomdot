@@ -46,8 +46,21 @@ export const SCENE = {
   letterInk: '#3a2e2a',
   leaf: '#80ed99',
   leafDeep: '#38b000',
+  roomTop: '#ffe9c9',
+  roomBottom: '#ffd6a0',
+  floor: '#e3b483',
+  shelf: '#b07d4f',
+  shelfEdge: '#8a6038',
+  cover: '#241f38',
+  stageTop: '#2b2350',
+  stageBottom: '#5a4a96',
+  stageGlow: '#b9a6ff',
   white: '#ffffff'
 } as const
+
+// Tone cycle for answer tiles, so a row of options reads as a lively multi-
+// colour set rather than one flat colour. Values map to --color-* tokens.
+export const TILE_TONES = ['sky', 'coral', 'leaf', 'sun', 'grape'] as const
 
 // Confetti / reward bursts draw from the full bright palette.
 export const CONFETTI_COLORS: readonly string[] = [

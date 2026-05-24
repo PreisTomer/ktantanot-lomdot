@@ -40,6 +40,27 @@ export const BEAR_ROUNDS = 6
 export const BEAR_MAX_SUM = 10
 export const BEAR_SCENE_W = 900
 export const BEAR_SCENE_H = 560
+
+export const TOWER_ROUNDS = 6
+export const TOWER_MAX = 9
+export const TOWER_BLOCKS = 3
+export const TOWER_SCENE_W = 900
+export const TOWER_SCENE_H = 520
+
+export const ROOM_ROUNDS = 6
+export const ROOM_SHOWN = 4
+export const ROOM_OPTIONS = 3
+export const ROOM_STUDY_MS = 3200
+export const ROOM_SCENE_W = 900
+export const ROOM_SCENE_H = 540
+
+export const SIMON_ROUNDS = 5
+export const SIMON_PADS = 4
+export const SIMON_START_LEN = 2
+export const SIMON_FLASH_MS = 440
+export const SIMON_GAP_MS = 640
+export const SIMON_SCENE_W = 900
+export const SIMON_SCENE_H = 540
 export const REWARD_DURATION_MS = 1500
 export const WRONG_FEEDBACK_MS = 600
 export const COUNT_MAX = 10

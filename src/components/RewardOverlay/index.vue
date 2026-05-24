@@ -22,12 +22,13 @@ export default defineComponent({
   methods: {
     fireConfetti() {
       if (this.prefersReducedMotion()) return
-      void confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: [...CONFETTI_COLORS]
-      })
+      const colors = [...CONFETTI_COLORS]
+      void confetti({ particleCount: 80, spread: 78, startVelocity: 46, origin: { y: 0.62 }, colors })
+      void confetti({ particleCount: 40, angle: 60, spread: 72, origin: { x: 0, y: 0.7 }, colors })
+      void confetti({ particleCount: 40, angle: 120, spread: 72, origin: { x: 1, y: 0.7 }, colors })
+      window.setTimeout(() => {
+        void confetti({ particleCount: 26, spread: 110, scalar: 1.5, shapes: ['star'], origin: { y: 0.5 }, colors })
+      }, 240)
     },
     prefersReducedMotion(): boolean {
       if (typeof window === 'undefined' || !window.matchMedia) return false
