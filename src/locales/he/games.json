@@ -16,7 +16,7 @@
     "soundSimon": { "title": "סיימון של צלילים", "prompt": "להקשיב לצלילים ולחזור עליהם" },
     "whereHidden": { "title": "איפה הסתתר?", "prompt": "עקבו אחרי הכדור, איפה הוא מסתתר?", "instruction": "לעקוב אחרי הכדור" },
     "completeSequence": { "title": "השלם את הרצף", "prompt": "מה בא עכשיו ברצף?", "instruction": "להשלים את הרצף, מה ממשיך אותו?" },
-    "rememberPath": { "title": "זכור את המסלול" },
+    "rememberPath": { "title": "זכור את המסלול", "prompt": "עקבו אחרי הארנב ואז חזרו על הדרך", "instruction": "לעקוב אחרי הארנב" },
     "sistersMission": { "title": "משימת האחיות" },
     "comingSoon": "המשחק הזה כמעט מוכן, בקרוב נשחק בו!",
     "soonBadge": "בקרוב",

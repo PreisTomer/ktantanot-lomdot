@@ -52,6 +52,14 @@ export const SWAP_COUNT = 4
 export const SHUFFLE_SCENE_W = 900
 export const SHUFFLE_SCENE_H = 460
 
+export const REMEMBER_ROUNDS = 5
+export const PATH_COLS = 5
+export const PATH_ROWS = 3
+export const PATH_START_LEN = 2
+export const PATH_STEP_MS = 720
+export const PATH_SCENE_W = 900
+export const PATH_SCENE_H = 560
+
 export const TOWER_ROUNDS = 6
 export const TOWER_MAX = 9
 export const TOWER_BLOCKS = 3

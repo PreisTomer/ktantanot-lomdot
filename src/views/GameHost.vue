@@ -19,6 +19,7 @@ import WhatInRoomGame from '@/components/games/WhatInRoom/index.vue'
 import SoundSimonGame from '@/components/games/SoundSimon/index.vue'
 import CompleteSequenceGame from '@/components/games/CompleteSequence/index.vue'
 import WhereHiddenGame from '@/components/games/WhereHidden/index.vue'
+import RememberPathGame from '@/components/games/RememberPath/index.vue'
 import ComingSoonGame from '@/components/games/ComingSoonGame.vue'
 
 import { GAME_ID, ROUTE } from '@/constants/strings'
@@ -46,7 +47,7 @@ const REGISTRY: Record<GameId, GameEntry> = {
   [GAME_ID.SOUND_SIMON]: { is: SoundSimonGame, props: {} },
   [GAME_ID.WHERE_HIDDEN]: { is: WhereHiddenGame, props: {} },
   [GAME_ID.COMPLETE_SEQUENCE]: { is: CompleteSequenceGame, props: {} },
-  [GAME_ID.REMEMBER_PATH]: comingSoon(GAME_ID.REMEMBER_PATH),
+  [GAME_ID.REMEMBER_PATH]: { is: RememberPathGame, props: {} },
   [GAME_ID.SISTERS_MISSION]: comingSoon(GAME_ID.SISTERS_MISSION)
 }
 
