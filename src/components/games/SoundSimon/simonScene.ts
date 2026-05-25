@@ -7,6 +7,7 @@ import gsap from 'gsap'
 
 import { COLOR, SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
+import { prefersReducedMotion } from '@/utils/motion'
 import { SIMON_SCENE_H, SIMON_SCENE_W } from '@/constants/gameConfig'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
@@ -81,7 +82,7 @@ export class SimonScene {
   }
 
   private buildNotes(): void {
-    if (!this.app) return
+    if (!this.app || prefersReducedMotion()) return
     for (let i = 0; i < 6; i++) {
       const note = new Text({
         text: NOTE_GLYPHS[i % NOTE_GLYPHS.length],

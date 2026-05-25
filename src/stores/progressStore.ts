@@ -3,7 +3,7 @@
 import { defineStore } from 'pinia'
 
 import { STARS_PER_CORRECT } from '@/constants/gameConfig'
-import type { ProfileProgress, ProgressByProfile } from '@/types/progress'
+import type { ItemStat, ProfileProgress, ProgressByProfile } from '@/types/progress'
 
 const STORAGE_KEY = 'ktantanot:progress:v1'
 
@@ -11,12 +11,37 @@ function emptyProgress(): ProfileProgress {
   return { stars: 0, items: {} }
 }
 
+// Persisted JSON is untrusted (it can be hand-edited or left over from an older
+// schema), so coerce every field to the expected shape rather than assuming it.
+function sanitize(parsed: Record<string, Partial<ProfileProgress>>): ProgressByProfile {
+  const out: ProgressByProfile = {}
+  for (const [id, progress] of Object.entries(parsed)) {
+    if (!progress || typeof progress !== 'object') continue
+    const items: Record<string, ItemStat> = {}
+    const rawItems = progress.items
+    if (rawItems && typeof rawItems === 'object') {
+      for (const [itemId, stat] of Object.entries(rawItems)) {
+        if (!stat || typeof stat !== 'object') continue
+        items[itemId] = {
+          seen: Number(stat.seen) || 0,
+          correct: Number(stat.correct) || 0,
+          lastSeen: Number(stat.lastSeen) || 0
+        }
+      }
+    }
+    out[id] = { stars: Number(progress.stars) || 0, items }
+  }
+  return out
+}
+
 function loadFromStorage(): ProgressByProfile {
   if (typeof localStorage === 'undefined') return {}
   const raw = localStorage.getItem(STORAGE_KEY)
   if (!raw) return {}
   try {
-    return JSON.parse(raw) as ProgressByProfile
+    const parsed = JSON.parse(raw) as Record<string, Partial<ProfileProgress>>
+    if (!parsed || typeof parsed !== 'object') return {}
+    return sanitize(parsed)
   } catch (error) {
     console.warn('Could not parse stored progress; starting fresh.', error)
     return {}

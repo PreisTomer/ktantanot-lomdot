@@ -39,14 +39,15 @@ import type { PatternRound } from '@/utils/patternSequence'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
 
-import { COMPLETE_OPTIONS, COMPLETE_ROUNDS } from '@/constants/gameConfig'
+import { TILE_TONES } from '@/theme/colors'
+
+import { COMPLETE_OPTIONS, COMPLETE_ROUNDS, WRONG_FEEDBACK_MS } from '@/constants/gameConfig'
 import { PATTERN_ITEMS } from '@/constants/patternItems'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { PatternScene } from './patternScene'
 
 const POOL = [...PATTERN_ITEMS]
-const TONES = ['sky', 'coral', 'leaf', 'sun', 'grape']
 
 function emptyRound(): PatternRound {
   return { sequence: [], missingIndex: 0, answer: '', options: [] }
@@ -59,6 +60,7 @@ export default defineComponent({
     return {
       round: emptyRound(),
       wrongValue: null as string | null,
+      wrongTimer: null as ReturnType<typeof setTimeout> | null,
       scene: null as PatternScene | null,
       rng: createRng(Date.now()) as Rng
     }
@@ -71,8 +73,8 @@ export default defineComponent({
     options(): string[] {
       return this.round.options
     },
-    tones(): string[] {
-      return TONES
+    tones(): readonly string[] {
+      return TILE_TONES
     }
   },
   created() {
@@ -85,6 +87,7 @@ export default defineComponent({
     this.scene = scene
   },
   beforeUnmount() {
+    if (this.wrongTimer) clearTimeout(this.wrongTimer)
     this.scene?.destroy()
   },
   methods: {
@@ -101,9 +104,9 @@ export default defineComponent({
       this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, 'pattern', isCorrect)
       if (!isCorrect) {
         this.wrongValue = value
-        window.setTimeout(() => {
+        this.wrongTimer = setTimeout(() => {
           this.wrongValue = null
-        }, 600)
+        }, WRONG_FEEDBACK_MS)
         submit(false)
         return
       }

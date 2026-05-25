@@ -97,9 +97,13 @@ export default defineComponent({
         }, LEAD_IN_MS + this.sequence.length * SIMON_GAP_MS)
       )
     },
-    nextRound() {
-      // Classic Simon: keep the whole sequence and add one new step each level.
-      this.sequence = appendStep(this.sequence, SIMON_PADS, this.rng)
+    nextRound(round: number) {
+      // Round 1 is a fresh start / Play Again: reseed to the short starting
+      // sequence. Otherwise classic Simon keeps the prefix and adds one step.
+      this.sequence =
+        round <= 1
+          ? generateToneSequence(SIMON_START_LEN, SIMON_PADS, this.rng)
+          : appendStep(this.sequence, SIMON_PADS, this.rng)
       this.inputIndex = 0
       this.timers.push(setTimeout(() => this.playSequence(), NEXT_PLAY_MS))
     },

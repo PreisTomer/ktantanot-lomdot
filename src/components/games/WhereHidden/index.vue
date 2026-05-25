@@ -30,6 +30,9 @@ import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { CupScene } from './cupScene'
 
+// Hold on the lifted winning cup so the child sees the ball before the reward.
+const REVEAL_DELAY_MS = 700
+
 export default defineComponent({
   name: 'WhereHiddenGame',
   components: { GameShell },
@@ -37,6 +40,7 @@ export default defineComponent({
     return {
       round: generateShuffle(CUP_COUNT, SWAP_COUNT, createRng(Date.now())),
       scene: null as CupScene | null,
+      revealTimer: null as ReturnType<typeof setTimeout> | null,
       rng: createRng(Date.now() + 1) as Rng
     }
   },
@@ -53,6 +57,7 @@ export default defineComponent({
     this.scene = scene
   },
   beforeUnmount() {
+    if (this.revealTimer) clearTimeout(this.revealTimer)
     this.scene?.destroy()
   },
   methods: {
@@ -75,10 +80,10 @@ export default defineComponent({
       }
       this.scene?.revealWin(slot)
       // Let the reveal play before the reward fires.
-      window.setTimeout(() => {
+      this.revealTimer = setTimeout(() => {
         const shell = this.$refs.shell as InstanceType<typeof GameShell> | undefined
         shell?.submit(true)
-      }, 700)
+      }, REVEAL_DELAY_MS)
     }
   }
 })

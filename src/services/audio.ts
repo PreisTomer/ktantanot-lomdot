@@ -4,9 +4,12 @@ import { SPEECH_LANG, SPEECH_PITCH, SPEECH_RATE } from '@/constants/gameConfig'
 import { AUDIO_CLIPS } from '@/constants/audioClips'
 import type { Phrase } from '@/constants/phrases'
 
+type LastRequest = { kind: 'speak'; text: string } | { kind: 'parts'; parts: string[] }
+
 class AudioService {
   private current: HTMLAudioElement | null = null
   private sequenceToken = 0
+  private lastRequest: LastRequest | null = null
 
   private get synth(): SpeechSynthesis | null {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
@@ -21,6 +24,7 @@ class AudioService {
   }
 
   speak(text: string): void {
+    this.lastRequest = { kind: 'speak', text }
     this.stop()
     const url = this.clipUrl(text)
     if (url) {
@@ -36,6 +40,7 @@ class AudioService {
   // Pre-rendered clips are chained only when every part has one; a single miss
   // falls back to Web Speech for the whole sequence so the cadence stays even.
   speakParts(parts: string[]): void {
+    this.lastRequest = { kind: 'parts', parts }
     this.stop()
     const urls = parts.map((part) => this.clipUrl(part))
     if (urls.every((url): url is string => url !== null)) {
@@ -54,6 +59,16 @@ class AudioService {
       return
     }
     this.speak(phrase.text)
+  }
+
+  // Re-speak the most recent prompt. Used by the start gate: the first screen's
+  // prompt is requested before any user gesture (so browsers block it); the
+  // opening tap then replays it with audio unlocked.
+  replayLast(): void {
+    const request = this.lastRequest
+    if (!request) return
+    if (request.kind === 'speak') this.speak(request.text)
+    else this.speakParts(request.parts)
   }
 
   stop(): void {

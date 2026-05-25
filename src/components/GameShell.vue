@@ -145,7 +145,7 @@ export default defineComponent({
         return
       }
       this.current += 1
-      this.$emit('next')
+      this.$emit('next', this.current)
     },
     finish() {
       this.isFinished = true
@@ -155,7 +155,7 @@ export default defineComponent({
     replay() {
       this.current = 1
       this.isFinished = false
-      this.$emit('next')
+      this.$emit('next', this.current)
     },
     goToWorld() {
       if (this.worldId) {

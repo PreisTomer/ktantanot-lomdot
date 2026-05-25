@@ -6,6 +6,7 @@ import gsap from 'gsap'
 
 import { CONFETTI_COLORS, SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
+import { prefersReducedMotion } from '@/utils/motion'
 import { DETECTIVE_SCENE_H, DETECTIVE_SCENE_W } from '@/constants/gameConfig'
 import type { PictureWord } from '@/constants/words'
 
@@ -110,7 +111,9 @@ export class DetectiveScene {
     glass.position.set(cx, cy)
     this.glassLetter = letter
     this.app.stage.addChild(glass)
-    this.track(gsap.to(glass.scale, { x: 1.05, y: 1.05, duration: 2.2, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+    if (!prefersReducedMotion()) {
+      this.track(gsap.to(glass.scale, { x: 1.05, y: 1.05, duration: 2.2, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+    }
   }
 
   setRound(target: string, options: PictureWord[], onPick: PickHandler): void {

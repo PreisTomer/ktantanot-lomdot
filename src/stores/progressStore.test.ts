@@ -44,4 +44,18 @@ describe('progressStore', () => {
     expect(reloaded.starsFor(PROFILE)).toBe(1)
     expect(reloaded.byProfile[PROFILE].items.alef.correct).toBe(1)
   })
+
+  it('starts fresh when stored data is malformed, then records normally', () => {
+    localStorage.setItem('ktantanot:progress:v1', '{"one":{"stars":"oops","items":[1,2]}}')
+    const store = useProgressStore()
+    expect(store.starsFor(PROFILE)).toBe(0)
+    store.recordAnswer(PROFILE, 'alef', true, 1000)
+    expect(store.byProfile[PROFILE].items.alef.seen).toBe(1)
+  })
+
+  it('ignores non-object persisted JSON', () => {
+    localStorage.setItem('ktantanot:progress:v1', '"not an object"')
+    const store = useProgressStore()
+    expect(store.byProfile).toEqual({})
+  })
 })

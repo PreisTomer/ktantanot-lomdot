@@ -7,6 +7,7 @@ import gsap from 'gsap'
 
 import { CONFETTI_COLORS } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
+import { prefersReducedMotion } from '@/utils/motion'
 import { CATCH_SCENE_H, CATCH_SCENE_W } from '@/constants/gameConfig'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
@@ -98,7 +99,9 @@ export class BalloonScene {
       cloud.circle(0, 0, 28).circle(30, 8, 22).circle(-28, 10, 20).fill({ color: '#ffffff', alpha: 0.8 })
       cloud.position.set(140 + i * 300, 80 + (i % 2) * 60)
       this.cloudLayer.addChild(cloud)
-      this.track(gsap.to(cloud, { x: cloud.x + 70, duration: 7 + i, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      if (!prefersReducedMotion()) {
+        this.track(gsap.to(cloud, { x: cloud.x + 70, duration: 7 + i, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      }
     }
   }
 

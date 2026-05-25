@@ -91,7 +91,6 @@ export class CupScene {
 
     // Warm spotlight focusing attention on the cups.
     const spot = new Graphics().ellipse(SHUFFLE_SCENE_W / 2, BASE_Y - 30, 360, 200).fill({ color: '#ffffff', alpha: 0.35 })
-    spot.filters = [new DropShadowFilter({ alpha: 0, blur: 0 })]
     this.app.stage.addChild(spot)
 
     // Wooden table.

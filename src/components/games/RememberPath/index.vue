@@ -95,8 +95,11 @@ export default defineComponent({
         this.scene?.setInteractive(true)
       })
     },
-    nextRound() {
-      this.sequence = extendPath(this.sequence, PATH_COLS, PATH_ROWS, START_COL, START_ROW, this.rng)
+    nextRound(round: number) {
+      // Round 1 is a fresh start / Play Again: reseed to the short starting
+      // path. Otherwise keep the path and add one step (grow-by-one).
+      this.sequence =
+        round <= 1 ? this.buildStart() : extendPath(this.sequence, PATH_COLS, PATH_ROWS, START_COL, START_ROW, this.rng)
       this.inputIndex = 0
       this.timers.push(setTimeout(() => this.showSequence(), NEXT_PLAY_MS))
     },

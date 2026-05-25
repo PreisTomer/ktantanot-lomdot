@@ -120,6 +120,10 @@ export class PatternScene {
   // Fill the gap with the correct symbol — confirms a correct answer.
   reveal(symbol: string): void {
     if (!this.slot) return
+    // Hide the "?" so the answer glyph doesn't sit on top of it.
+    for (const child of this.slot.children) {
+      if (child instanceof Text) child.visible = false
+    }
     const glyph = new Text({ text: symbol, style: { fontFamily: FONT, fontSize: 64 } })
     glyph.anchor.set(0.5)
     glyph.scale.set(0)

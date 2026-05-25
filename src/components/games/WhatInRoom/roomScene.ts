@@ -6,6 +6,7 @@ import gsap from 'gsap'
 
 import { SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
+import { prefersReducedMotion } from '@/utils/motion'
 import { ROOM_SCENE_H, ROOM_SCENE_W } from '@/constants/gameConfig'
 import type { RoomItem } from '@/constants/memoryItems'
 
@@ -122,7 +123,9 @@ export class RoomScene {
       text.filters = [new DropShadowFilter({ alpha: 0.28, blur: 3 })]
       this.app?.stage.addChild(text)
       this.items.push({ key: item.key, text, x, y: SHELF_Y })
-      this.track(gsap.to(text, { y: SHELF_Y - 6, duration: 1.8 + i * 0.15, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      if (!prefersReducedMotion()) {
+        this.track(gsap.to(text, { y: SHELF_Y - 6, duration: 1.8 + i * 0.15, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      }
     })
   }
 
@@ -164,7 +167,9 @@ export class RoomScene {
     gap.position.set(x, y)
     this.app.stage.addChild(gap)
     this.gap = gap
-    this.track(gsap.to(gap.scale, { x: 1.12, y: 1.12, duration: 0.9, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+    if (!prefersReducedMotion()) {
+      this.track(gsap.to(gap.scale, { x: 1.12, y: 1.12, duration: 0.9, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+    }
   }
 
   private removeGap(): void {

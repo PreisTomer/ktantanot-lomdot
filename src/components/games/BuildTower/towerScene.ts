@@ -6,6 +6,7 @@ import gsap from 'gsap'
 
 import { COLOR, SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
+import { prefersReducedMotion } from '@/utils/motion'
 import { TOWER_SCENE_H, TOWER_SCENE_W } from '@/constants/gameConfig'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
@@ -150,15 +151,17 @@ export class TowerScene {
       this.app?.stage.addChild(container)
       this.blocks.push({ value, container, placed: false })
 
-      this.track(
-        gsap.to(container, {
-          y: TRAY_Y + 7,
-          duration: 1.6 + i * 0.2,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut'
-        })
-      )
+      if (!prefersReducedMotion()) {
+        this.track(
+          gsap.to(container, {
+            y: TRAY_Y + 7,
+            duration: 1.6 + i * 0.2,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+          })
+        )
+      }
     })
   }
 

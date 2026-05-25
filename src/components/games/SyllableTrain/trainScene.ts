@@ -6,6 +6,7 @@ import gsap from 'gsap'
 
 import { SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
+import { prefersReducedMotion } from '@/utils/motion'
 import { TRAIN_CAR, TRAIN_SCENE_H, TRAIN_SCENE_W } from '@/constants/gameConfig'
 import type { WordCard } from '@/constants/words'
 
@@ -98,7 +99,10 @@ export class TrainScene {
     sun.filters = [new GlowFilter({ color: 0xffd60a, outerStrength: 4, distance: 18 })]
     sun.position.set(TRAIN_SCENE_W - 140, 96)
     this.app.stage.addChild(sun)
-    this.track(gsap.to(sun.scale, { x: 1.08, y: 1.08, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+    const reduce = prefersReducedMotion()
+    if (!reduce) {
+      this.track(gsap.to(sun.scale, { x: 1.08, y: 1.08, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+    }
 
     const far = new Graphics().ellipse(300, TRAIN_SCENE_H - 110, 360, 130).fill({ color: SCENE.hillFar })
     const near = new Graphics().ellipse(660, TRAIN_SCENE_H - 80, 380, 120).fill({ color: SCENE.hillNear })
@@ -119,7 +123,9 @@ export class TrainScene {
       cloud.circle(0, 0, 26).circle(28, 6, 20).circle(-26, 8, 18).fill({ color: '#ffffff', alpha: 0.85 })
       cloud.position.set(160 + i * 280, 70 + (i % 2) * 36)
       this.cloudLayer.addChild(cloud)
-      this.track(gsap.to(cloud, { x: cloud.x + 60, duration: 6 + i, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      if (!reduce) {
+        this.track(gsap.to(cloud, { x: cloud.x + 60, duration: 6 + i, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      }
     }
   }
 
