@@ -28,10 +28,11 @@ playable; the rest show `ComingSoonGame` with a "בקרוב" badge.
 - [x] **איפה הסתתר?** — shell game: watch the ball, track it through the shuffle
 - [x] **זכור את המסלול** — watch the rabbit's path, retrace it on the D-pad
 
-## Remaining
-
 ### משימת האחיות (shared, two players)
-- [ ] **משימת האחיות** — one reads the clue, the other remembers the path
+- [x] **משימת האחיות** — one reads the clue (directions), the other walks the path
+
+## All games built 🎉
+All 14 games across the four worlds are playable.
 
 ## Adaptive engine (cross-cutting)
 Currently `pickNextItem` (spaced repetition) on a single `guest` profile. To do:
