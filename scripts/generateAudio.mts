@@ -9,7 +9,7 @@
 
 import { execFile } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -49,6 +49,9 @@ interface GamesLocale {
     buildTower: { prompt: string; instruction: string }
     whatInRoom: { study: string; recall: string }
     soundSimon: { prompt: string }
+    whereHidden: { prompt: string; instruction: string }
+    completeSequence: { prompt: string; instruction: string }
+    rememberPath: { prompt: string; instruction: string }
   }
 }
 interface WorldsLocale {
@@ -120,6 +123,13 @@ function collectStrings(): string[] {
   add(games.whatInRoom.recall)
 
   add(games.soundSimon.prompt)
+
+  add(games.whereHidden.prompt)
+  add(games.whereHidden.instruction)
+  add(games.completeSequence.prompt)
+  add(games.completeSequence.instruction)
+  add(games.rememberPath.prompt)
+  add(games.rememberPath.instruction)
 
   return [...out].sort()
 }
@@ -195,6 +205,18 @@ async function main(): Promise<void> {
 
   writeManifest(entries)
   console.log(`Manifest written: ${MANIFEST_PATH} (${entries.length} entries).`)
+
+  // Drop clips no longer referenced (e.g. after a line is reworded), so the PWA
+  // precache never ships orphaned audio.
+  const valid = new Set(entries.map(([, name]) => name))
+  let pruned = 0
+  for (const file of readdirSync(OUT_DIR)) {
+    if (file.endsWith('.mp3') && !valid.has(file)) {
+      rmSync(join(OUT_DIR, file), { force: true })
+      pruned++
+    }
+  }
+  if (pruned > 0) console.log(`Pruned ${pruned} orphaned clip(s).`)
 
   if (failures.length > 0) {
     console.error(`${failures.length} clips failed to render.`)

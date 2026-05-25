@@ -60,6 +60,9 @@ export const PATH_STEP_MS = 720
 export const PATH_SCENE_W = 900
 export const PATH_SCENE_H = 560
 
+export const SISTERS_ROUNDS = 5
+export const SISTERS_PATH_LEN = 3
+
 export const TOWER_ROUNDS = 6
 export const TOWER_MAX = 9
 export const TOWER_BLOCKS = 3
