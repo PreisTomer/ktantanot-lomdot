@@ -26,11 +26,9 @@ playable; the rest show `ComingSoonGame` with a "בקרוב" badge.
 - [x] **סיימון של צלילים** — repeat a growing sequence of sound pads
 - [x] **השלם את הרצף** — complete the repeating pattern (tap what comes next)
 - [x] **איפה הסתתר?** — shell game: watch the ball, track it through the shuffle
+- [x] **זכור את המסלול** — watch the rabbit's path, retrace it on the D-pad
 
 ## Remaining
-
-### זיכרון (memory)
-- [ ] **זכור את המסלול** — repeat the rabbit's path (right→left→up)
 
 ### משימת האחיות (shared, two players)
 - [ ] **משימת האחיות** — one reads the clue, the other remembers the path
