@@ -69,6 +69,53 @@ function fill(template: string, values: Record<string, number>): string {
   return template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key]))
 }
 
+// Feminine cardinals with niqqud. The neural voice mis-reads bare digits and
+// unvocalised number words, but honours niqqud, so the spoken story is built
+// from these instead of the displayed digits. BEFORE_NOUN is the form used in
+// front of a counted feminine noun (שְׁתֵּי עוגות); STANDALONE is the bare count
+// (the frog's number-line positions). Index = the number.
+const FEM_BEFORE_NOUN = ['אֶפֶס', 'אַחַת', 'שְׁתֵּי', 'שָׁלוֹשׁ', 'אַרְבַּע', 'חָמֵשׁ', 'שֵׁשׁ', 'שֶׁבַע', 'שְׁמוֹנֶה', 'תֵּשַׁע', 'עֶשֶׂר']
+const FEM_STANDALONE = ['אֶפֶס', 'אַחַת', 'שְׁתַּיִם', 'שָׁלוֹשׁ', 'אַרְבַּע', 'חָמֵשׁ', 'שֵׁשׁ', 'שֶׁבַע', 'שְׁמוֹנֶה', 'תֵּשַׁע', 'עֶשֶׂר']
+
+function countPhrase(n: number, singular: string, plural: string): string {
+  return n === 1 ? `${singular} אַחַת` : `${FEM_BEFORE_NOUN[n]} ${plural}`
+}
+
+// Maps a displayed/requested string to the text actually fed to the TTS, so we
+// can fix pronunciation (homograph niqqud, spelled-out numbers) without ever
+// changing what the app shows or how the runtime keys the clip.
+function buildOverrides(): Map<string, string> {
+  const games = loadLocale<GamesLocale>('games').games
+  const worlds = loadLocale<WorldsLocale>('worlds').worlds
+  const hub = loadLocale<HubLocale>('hub').hub
+  const o = new Map<string, string>()
+
+  o.set(worlds.memory.prompt, 'בואו נְאַמֵּן את הזיכרון')
+  o.set(hub.prompt, 'בואו נבחר מִשְׂחָק ונלמד ביחד')
+  o.set(games.comingSoon, 'הַמִּשְׂחָק הזה כמעט מוכן, בקרוב נשחק בו!')
+
+  for (let a = 1; a <= BEAR_MAX_SUM; a++) {
+    for (let b = 1; a + b <= BEAR_MAX_SUM; b++) {
+      o.set(
+        fill(games.bearRestaurant.story, { a, b }),
+        `הדוב קיבל ${countPhrase(a, 'עוגה', 'עוגות')} ועוד ${countPhrase(b, 'עוגה', 'עוגות')}`
+      )
+    }
+  }
+  for (let stolen = 1; stolen < MONKEY_MAX; stolen++) {
+    o.set(fill(games.thiefMonkey.story, { stolen }), `הקוף הגנב לקח ${countPhrase(stolen, 'בננה', 'בננות')} מהעץ`)
+  }
+  for (let start = 0; start < FROG_MAX; start++) {
+    for (let add = 1; start + add <= FROG_MAX; add++) {
+      o.set(
+        fill(games.frogJumps.story, { start, add }),
+        `הצפרדע על ${FEM_STANDALONE[start]} וקופצת עוד ${FEM_STANDALONE[add]}`
+      )
+    }
+  }
+  return o
+}
+
 function collectStrings(): string[] {
   const games = loadLocale<GamesLocale>('games').games
   const worlds = loadLocale<WorldsLocale>('worlds').worlds
@@ -185,8 +232,11 @@ async function main(): Promise<void> {
   mkdirSync(OUT_DIR, { recursive: true })
 
   const texts = collectStrings()
+  const overrides = buildOverrides()
   const entries: [string, string][] = texts.map((text) => [text, clipName(text)])
-  const pending = entries.filter(([, name]) => force || !existsSync(join(OUT_DIR, name)))
+  // Overridden strings keep their filename (keyed on displayed text) but their
+  // audio content changed, so re-render them even on an incremental run.
+  const pending = entries.filter(([text, name]) => force || overrides.has(text) || !existsSync(join(OUT_DIR, name)))
 
   console.log(`${texts.length} unique strings; ${pending.length} to synthesize (voice ${VOICE}, rate ${RATE}).`)
 
@@ -194,7 +244,7 @@ async function main(): Promise<void> {
   let done = 0
   await runPool(pending, async ([text, name]) => {
     try {
-      await synthesize(text, join(OUT_DIR, name))
+      await synthesize(overrides.get(text) ?? text, join(OUT_DIR, name))
     } catch (error) {
       failures.push(text)
       console.error(`FAILED: ${text}\n  ${error instanceof Error ? error.message : String(error)}`)
