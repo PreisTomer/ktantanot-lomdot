@@ -9,7 +9,7 @@ export interface Phrase {
 // it fits every child (see strings.md). audioFile may later point to a recorded
 // clip; until then the text is spoken via TTS.
 export const PHRASE = {
-  amazing: { text: 'וואו! פשוט מדהים!' },
+  amazing: { text: 'מעולה! פשוט מדהים!' },
   wellDone: { text: 'כל הכבוד! עבודה יפה!' },
   superStar: { text: 'איזה כוכב גדול!' },
   brilliant: { text: 'מצוין! בדיוק נכון!' },
