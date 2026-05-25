@@ -79,16 +79,33 @@ export class PathScene {
   private buildGrid(): void {
     if (!this.app) return
     const gridW = PATH_COLS * CELL
+    const gridH = PATH_ROWS * CELL
     const x0 = (PATH_SCENE_W - gridW) / 2
-    const y0 = 48
+    const y0 = 44
+    const boardPad = 26
+    const grassLight = lerpColor(SCENE.leaf, '#ffffff', 0.62)
+    const stoneTop = lerpColor(SCENE.leaf, '#ffffff', 0.12)
+    const stoneHi = lerpColor(SCENE.leaf, '#ffffff', 0.55)
+
+    // Garden bed framing the grid.
+    const board = new Graphics()
+      .roundRect(x0 - boardPad, y0 - boardPad, gridW + boardPad * 2, gridH + boardPad * 2, 34)
+      .fill({ color: grassLight })
+    board.roundRect(x0 - boardPad, y0 - boardPad, gridW + boardPad * 2, gridH + boardPad * 2, 34).stroke({ width: 5, color: SCENE.leaf, alpha: 0.45 })
+    board.filters = [new DropShadowFilter({ alpha: 0.22, blur: 5 })]
+    this.app.stage.addChild(board)
+
+    // Dimensional stepping stones (shadow, raised rim, glossy top, highlight).
     const stones = new Graphics()
     for (let r = 0; r < PATH_ROWS; r++) {
       const rowCells: { x: number; y: number }[] = []
       for (let c = 0; c < PATH_COLS; c++) {
         const x = x0 + c * CELL + CELL / 2
         const y = y0 + r * CELL + CELL / 2
-        stones.circle(x, y, 30).fill({ color: SCENE.leaf })
-        stones.circle(x, y, 22).fill({ color: SCENE.leafDeep, alpha: 0.5 })
+        stones.ellipse(x, y + 11, 29, 9).fill({ color: SCENE.wheel, alpha: 0.12 })
+        stones.circle(x, y + 4, 31).fill({ color: SCENE.leafDeep })
+        stones.circle(x, y, 31).fill({ color: stoneTop })
+        stones.ellipse(x - 9, y - 10, 13, 7).fill({ color: stoneHi, alpha: 0.75 })
         rowCells.push({ x, y })
       }
       this.cells.push(rowCells)
