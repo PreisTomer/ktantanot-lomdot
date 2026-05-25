@@ -55,7 +55,12 @@ export const SCENE = {
   stageTop: '#2b2350',
   stageBottom: '#5a4a96',
   stageGlow: '#b9a6ff',
-  white: '#ffffff'
+  white: '#ffffff',
+  grassDeep: '#46b86a',
+  path: '#e8d6b0',
+  pathEdge: '#c9b48a',
+  roof: '#e5604a',
+  doorBrown: '#8a5a3b'
 } as const
 
 // Tone cycle for answer tiles, so a row of options reads as a lively multi-

@@ -3,20 +3,22 @@
   <GameShell
     ref="shell"
     :title="$t('games.sistersMission.title')"
-    :prompt="prompt"
+    :prompt="$t('games.sistersMission.prompt')"
     :speech-parts="speechParts"
     :rounds="rounds"
     @next="nextRound"
   >
     <div class="sisters">
-      <div v-if="phase === 'read'" class="sisters__clue">
-        <div class="sisters__chips">
-          <span v-for="(dir, index) in dirs" :key="index" class="sisters__chip">
-            <span class="sisters__chip-arrow">{{ arrow(dir) }}</span>
-            <span>{{ dirWord(dir) }}</span>
-          </span>
-        </div>
-        <button class="sisters__go" type="button" @click="startWalk">{{ $t('games.sistersMission.go') }}</button>
+      <div class="sisters__clue">
+        <span
+          v-for="(dir, index) in dirs"
+          :key="index"
+          class="sisters__chip"
+          :class="{ 'sisters__chip--done': index < inputIndex }"
+        >
+          <span class="sisters__chip-arrow">{{ arrow(dir) }}</span>
+          <span>{{ dirWord(dir) }}</span>
+        </span>
       </div>
       <canvas ref="stage" class="sisters__stage"></canvas>
     </div>
@@ -40,8 +42,6 @@ import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { SistersScene } from './sistersScene'
 
-type Phase = 'read' | 'walk'
-
 const START_COL = Math.floor(PATH_COLS / 2)
 const START_ROW = Math.floor(PATH_ROWS / 2)
 const DIR_KEYS = ['up', 'down', 'left', 'right']
@@ -52,9 +52,9 @@ export default defineComponent({
   components: { GameShell },
   data() {
     return {
-      phase: 'read' as Phase,
       dirs: [] as number[],
       inputIndex: 0,
+      busy: false,
       scene: null as SistersScene | null,
       rng: createRng(Date.now()) as Rng
     }
@@ -64,13 +64,8 @@ export default defineComponent({
     rounds(): number {
       return SISTERS_ROUNDS
     },
-    prompt(): string {
-      return this.phase === 'read'
-        ? this.$t('games.sistersMission.readPrompt')
-        : this.$t('games.sistersMission.walkPrompt')
-    },
     speechParts(): string[] {
-      return [this.prompt]
+      return [this.$t('games.sistersMission.prompt'), ...this.dirs.map((dir) => this.dirWord(dir))]
     }
   },
   created() {
@@ -81,7 +76,7 @@ export default defineComponent({
     await scene.init(this.$refs.stage as HTMLCanvasElement)
     scene.setHandler(this.handleDir)
     scene.setRound(this.dirs)
-    scene.setInteractive(false)
+    scene.setInteractive(true)
     this.scene = scene
   },
   beforeUnmount() {
@@ -101,38 +96,32 @@ export default defineComponent({
     dirWord(dir: number): string {
       return this.$t(`games.sistersMission.dir.${DIR_KEYS[dir]}`)
     },
-    startWalk() {
-      this.phase = 'walk'
-      this.inputIndex = 0
-      this.scene?.setInteractive(true)
-    },
     nextRound() {
       this.dirs = this.buildPath()
       this.inputIndex = 0
-      this.phase = 'read'
-      this.scene?.setInteractive(false)
+      this.busy = false
       this.scene?.setRound(this.dirs)
+      this.scene?.setInteractive(true)
     },
     handleDir(dir: number) {
-      if (this.phase !== 'walk') return
+      if (this.busy) return
       const shell = this.$refs.shell as InstanceType<typeof GameShell> | undefined
       if (!shell) return
-      if (dir === this.dirs[this.inputIndex]) {
-        this.scene?.hopSister(dir)
-        this.inputIndex += 1
-        if (this.inputIndex >= this.dirs.length) {
-          this.scene?.setInteractive(false)
-          this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, `sisters-${this.dirs.length}`, true)
-          this.scene?.celebrate()
-          shell.submit(true)
-        }
+      if (dir !== this.dirs[this.inputIndex]) {
+        // Wrong turn: gentle nudge, stay put, try again (no restart).
+        this.scene?.nudgeArrow(dir)
+        shell.submit(false)
         return
       }
-      this.scene?.setInteractive(false)
-      this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, `sisters-${this.dirs.length}`, false)
-      this.scene?.resetSister()
-      this.phase = 'read'
-      shell.submit(false)
+      this.scene?.hopSister(dir)
+      this.inputIndex += 1
+      if (this.inputIndex >= this.dirs.length) {
+        this.busy = true
+        this.scene?.setInteractive(false)
+        this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, `sisters-${this.dirs.length}`, true)
+        this.scene?.celebrate()
+        shell.submit(true)
+      }
     }
   }
 })
@@ -147,11 +136,6 @@ export default defineComponent({
   inline-size: 100%;
 
   &__clue {
-    @include flex-column-center;
-    gap: var(--sp-md);
-  }
-
-  &__chips {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -168,20 +152,16 @@ export default defineComponent({
     background: var(--color-surface);
     border-radius: var(--radius-pill);
     box-shadow: var(--shadow-soft);
+    transition: background var(--tr-fast), opacity var(--tr-fast);
+
+    &--done {
+      background: color-mix(in srgb, var(--color-leaf) 45%, var(--color-surface));
+      opacity: var(--op-strong);
+    }
 
     &-arrow {
       font-size: var(--fs-lg);
     }
-  }
-
-  &__go {
-    @include flex-center;
-    @include pressable;
-    padding: var(--sp-sm) var(--sp-xl);
-    font-size: var(--fs-md);
-    font-weight: 700;
-    color: var(--color-white);
-    background: var(--color-primary);
   }
 
   &__stage {
