@@ -7,7 +7,7 @@
     },
     "catchWord": { "title": "לתפוס את המילה", "prompt": "לתפוס את המילה {word}", "instruction": "לתפוס את המילה", "cue": "לתפוס את:" },
     "soundDetective": { "title": "הבלשית", "prompt": "למצוא מילה שמתחילה באות {letter}", "instruction": "איזו מילה מתחילה באות" },
-    "magicBook": { "title": "ספר הקסם", "prompt": "געו בכל מילה והיא תתעורר", "instruction": "געו בכל מילה והיא תתעורר" },
+    "magicBook": { "title": "ספר הקסם", "prompt": "להקשיב למילה ולמצוא אותה", "instruction": "להקשיב למילה ולמצוא אותה", "find": "למצוא את המילה" },
     "bearRestaurant": { "title": "המסעדה של הדוב", "prompt": "כמה עוגות יש בצלחת?", "story": "הדוב קיבל {a} עוגות ועוד {b} עוגות" },
     "thiefMonkey": { "title": "הקוף הגנב", "prompt": "כמה בננות נשארו?", "story": "הקוף הגנב לקח {stolen} בננות מהעץ" },
     "frogJumps": { "title": "קפיצות צפרדע", "prompt": "לאן הצפרדע תגיע?", "story": "הצפרדע על {start} וקופצת עוד {add}" },

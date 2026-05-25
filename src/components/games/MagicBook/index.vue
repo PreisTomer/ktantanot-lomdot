@@ -25,12 +25,13 @@
           </div>
           <div ref="sentence" class="magic__sentence">
             <button
-              v-for="word in page.words"
+              v-for="word in displayWords"
               :key="word.text"
               class="magic__word"
               :class="{ 'magic__word--awake': isAwake(word) }"
+              :data-word="word.text"
               type="button"
-              :disabled="isBusy"
+              :disabled="isBusy || busy"
               @click="tapWord(word, submit)"
             >
               {{ word.text }}
@@ -53,11 +54,12 @@ import { audio } from '@/services/audio'
 
 import GameShell from '@/components/GameShell.vue'
 
+import { shuffle } from '@/utils/shuffle'
 import { pickNextItem } from '@/utils/spacedRepetition'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
 
-import { MAGIC_ROUNDS } from '@/constants/gameConfig'
+import { MAGIC_ADVANCE_MS, MAGIC_COMPLETE_MS, MAGIC_ROUNDS } from '@/constants/gameConfig'
 import { MAGIC_STORIES } from '@/constants/stories'
 import type { StoryPage, StoryWord } from '@/constants/stories'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
@@ -73,11 +75,15 @@ export default defineComponent({
   data() {
     return {
       page: MAGIC_STORIES[0] as StoryPage,
-      discovered: [] as string[],
+      order: [] as number[],
+      targetIndex: 0,
+      found: [] as string[],
+      busy: false,
       recent: [] as string[],
       completed: false,
       reduceMotion: false,
       completeTimer: null as ReturnType<typeof setTimeout> | null,
+      advanceTimer: null as ReturnType<typeof setTimeout> | null,
       rng: createRng(Date.now()) as Rng
     }
   },
@@ -89,17 +95,20 @@ export default defineComponent({
     rounds(): number {
       return MAGIC_ROUNDS
     },
-    sentence(): string {
-      return this.page.words.map((word) => word.text).join(' ')
+    target(): StoryWord {
+      return this.page.words[Math.min(this.targetIndex, this.page.words.length - 1)]
+    },
+    displayWords(): StoryWord[] {
+      return this.order.map((index) => this.page.words[index])
     },
     speechParts(): string[] {
-      return [this.$t('games.magicBook.instruction'), this.sentence]
+      return [this.$t('games.magicBook.find'), this.target.text]
     },
     discoveredWords(): StoryWord[] {
-      return this.page.words.filter((word) => this.discovered.includes(word.text))
+      return this.page.words.filter((word) => this.found.includes(word.text))
     },
     isSceneEmpty(): boolean {
-      return this.discovered.length === 0
+      return this.found.length === 0
     }
   },
   created() {
@@ -111,6 +120,7 @@ export default defineComponent({
   },
   beforeUnmount() {
     if (this.completeTimer) clearTimeout(this.completeTimer)
+    if (this.advanceTimer) clearTimeout(this.advanceTimer)
   },
   methods: {
     pickPage() {
@@ -119,25 +129,60 @@ export default defineComponent({
       this.recent.push(id)
       if (this.recent.length > STORY_IDS.length - 1) this.recent.shift()
       this.page = MAGIC_STORIES.find((story) => story.id === id) ?? MAGIC_STORIES[0]
-      this.discovered = []
+      this.order = this.scrambleOrder(this.page.words.length)
+      this.targetIndex = 0
+      this.found = []
+      this.busy = false
       this.completed = false
+    },
+    scrambleOrder(length: number): number[] {
+      const indices = Array.from({ length }, (_, i) => i)
+      let order = shuffle(indices, this.rng)
+      while (length > 1 && order.every((value, i) => value === i)) {
+        order = shuffle(indices, this.rng)
+      }
+      return order
     },
     nextRound() {
       this.pickPage()
       this.$nextTick(() => this.revealPage())
     },
     isAwake(word: StoryWord): boolean {
-      return this.discovered.includes(word.text)
+      return this.found.includes(word.text)
     },
     tapWord(word: StoryWord, submit: SubmitFn) {
+      if (this.busy || this.completed) return
+      if (word.text !== this.target.text) {
+        this.nudgeWord(word.text)
+        submit(false)
+        return
+      }
+      this.busy = true
+      this.found.push(word.text)
       audio.speak(word.text)
-      if (!this.discovered.includes(word.text)) this.discovered.push(word.text)
       this.$nextTick(() => this.animateActor(word))
-      if (!this.completed && this.discovered.length === this.page.words.length) {
+      const isLast = this.targetIndex >= this.page.words.length - 1
+      if (isLast) {
         this.completed = true
         this.progressStore.recordAnswer(DEFAULT_PROFILE_ID, this.page.id, true)
-        this.completeTimer = setTimeout(() => submit(true), 900)
+        this.completeTimer = setTimeout(() => submit(true), MAGIC_COMPLETE_MS)
+        return
       }
+      this.advanceTimer = setTimeout(() => {
+        this.targetIndex += 1
+        this.busy = false
+      }, MAGIC_ADVANCE_MS)
+    },
+    nudgeWord(text: string) {
+      if (this.reduceMotion) return
+      const sentence = this.$refs.sentence as HTMLElement | undefined
+      const el = sentence?.querySelector(`[data-word="${text}"]`) as HTMLElement | null
+      if (!el) return
+      gsap.fromTo(
+        el,
+        { x: -6 },
+        { x: 6, duration: 0.07, yoyo: true, repeat: 3, ease: 'sine.inOut', clearProps: 'x' }
+      )
     },
     revealPage() {
       if (this.reduceMotion) return

@@ -25,6 +25,8 @@ export const DETECTIVE_SCENE_W = 900
 export const DETECTIVE_SCENE_H = 560
 
 export const MAGIC_ROUNDS = 5
+export const MAGIC_ADVANCE_MS = 900
+export const MAGIC_COMPLETE_MS = 1100
 
 export const MONKEY_ROUNDS = 6
 export const MONKEY_MAX = 9
