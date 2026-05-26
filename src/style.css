@@ -136,3 +136,15 @@ canvas[class$='__stage'] {
     max-block-size: 72vh !important;
   }
 }
+
+/* Portrait phones: bound the stage by height too, reserving room for the header,
+   progress dots, clue chips and answer row. This guarantees in-canvas controls
+   (e.g. the Sisters / Remember-Path D-pad at the bottom of the scene) stay on
+   screen instead of being pushed past the fold. */
+@media (max-width: 600px) and (orientation: portrait) {
+  canvas[class$='__stage'] {
+    inline-size: auto !important;
+    max-inline-size: 100% !important;
+    max-block-size: calc(100svh - 240px) !important;
+  }
+}

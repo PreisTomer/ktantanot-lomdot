@@ -67,6 +67,10 @@ export const PATH_SCENE_W = 900
 export const PATH_SCENE_H = 560
 export const PATH_SCENE_PORTRAIT_W = 620
 export const PATH_SCENE_PORTRAIT_H = 820
+// Sisters carries extra chrome above the canvas (the spoken-direction clue
+// chips), so its portrait stage is shorter, keeping the in-scene D-pad on screen.
+export const SISTERS_SCENE_PORTRAIT_W = 620
+export const SISTERS_SCENE_PORTRAIT_H = 560
 
 export const SISTERS_ROUNDS = 5
 export const SISTERS_PATH_LEN = 3

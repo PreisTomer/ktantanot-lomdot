@@ -42,11 +42,11 @@ import {
   PATH_COLS,
   PATH_ROWS,
   PATH_SCENE_H,
-  PATH_SCENE_PORTRAIT_H,
-  PATH_SCENE_PORTRAIT_W,
   PATH_SCENE_W,
   SISTERS_PATH_LEN,
-  SISTERS_ROUNDS
+  SISTERS_ROUNDS,
+  SISTERS_SCENE_PORTRAIT_H,
+  SISTERS_SCENE_PORTRAIT_W
 } from '@/constants/gameConfig'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
@@ -100,7 +100,7 @@ export default defineComponent({
     stageSize() {
       return pickStageSize(
         { width: PATH_SCENE_W, height: PATH_SCENE_H },
-        { width: PATH_SCENE_PORTRAIT_W, height: PATH_SCENE_PORTRAIT_H }
+        { width: SISTERS_SCENE_PORTRAIT_W, height: SISTERS_SCENE_PORTRAIT_H }
       )
     },
     handleOrientation() {

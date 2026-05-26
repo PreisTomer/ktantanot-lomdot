@@ -57,7 +57,7 @@ export const MAGIC_STORIES: Record<Locale, StoryPage[]> = {
       words: [
         { text: 'השמש', picture: '☀️', action: 'spin' },
         { text: 'זורחת', picture: '🌟', action: 'grow' },
-        { text: 'חזק', picture: '✨', action: 'spin' }
+        { text: 'במרום', picture: '☁️', action: 'rise' }
       ]
     },
     {

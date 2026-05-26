@@ -131,6 +131,14 @@ function buildOverrides(code: Locale): Map<string, string> {
   o.set(hub.prompt, 'בואו נבחר מִשְׂחָק ונלמד ביחד')
   o.set(games.comingSoon, 'הַמִּשְׂחָק הזה כמעט מוכן, בקרוב נשחק בו!')
 
+  // Words the voice mis-reads without vowel points.
+  o.set('מעולה! פשוט מדהים!', 'מְעוּלֶה! פשוט מדהים!')
+  o.set('הפרה', 'הַפָּרָה')
+  o.set('עשב', 'עֵשֶׂב')
+  o.set('גזר', 'גֶּזֶר')
+  o.set('במרום', 'בַּמָּרוֹם')
+  o.set(games.sistersMission.prompt, 'קִרְאוּ את הדרך הביתה, ולכו לפי החצים')
+
   for (let a = 1; a <= BEAR_MAX_SUM; a++) {
     for (let b = 1; a + b <= BEAR_MAX_SUM; b++) {
       o.set(
