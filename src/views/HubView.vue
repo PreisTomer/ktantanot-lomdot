@@ -62,10 +62,15 @@ export default defineComponent({
 
   &__header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--sp-md);
     margin-block-end: var(--sp-xl);
+
+    @media (max-width: 600px) {
+      margin-block-end: var(--sp-lg);
+    }
   }
 
   &__titles {
@@ -82,7 +87,7 @@ export default defineComponent({
 
   &__title {
     margin: 0;
-    font-size: var(--fs-2xl);
+    font-size: clamp(1.8rem, 6vw, var(--fs-2xl));
     font-weight: 700;
     color: var(--color-ink);
   }

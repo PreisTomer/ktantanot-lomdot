@@ -88,6 +88,10 @@ export default defineComponent({
     @include flex-center;
     min-block-size: 100vh;
     padding: var(--sp-lg);
+
+    @media (max-width: 600px) {
+      padding: var(--sp-md);
+    }
   }
 
   &__gate {

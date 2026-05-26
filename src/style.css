@@ -116,3 +116,22 @@ button {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Game stages: Pixi (autoDensity) writes an explicit inline width/height on the
+   <canvas>, which ignores stylesheet sizing and overflows narrow screens. Force
+   every game stage to scale with its container; each game's own max-inline-size
+   still caps it on large screens. The confetti canvas has no __stage class. */
+canvas[class$='__stage'] {
+  inline-size: 100% !important;
+  block-size: auto !important;
+}
+
+/* Short landscape phones: also bound the stage by height so the header and
+   answer row stay on screen, fitting the canvas within both axes. */
+@media (orientation: landscape) and (max-height: 540px) {
+  canvas[class$='__stage'] {
+    inline-size: auto !important;
+    max-inline-size: 100% !important;
+    max-block-size: 72vh !important;
+  }
+}
