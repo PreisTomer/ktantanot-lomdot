@@ -1,6 +1,12 @@
 <!-- Copyright © 2026 Tomer Preis. Licensed under the MIT License. -->
 <template>
-  <button class="speaker" type="button" :aria-label="$t('common.repeat')" @click="repeat">
+  <button
+    class="speaker"
+    :class="{ 'speaker--speaking': isSpeaking }"
+    type="button"
+    :aria-label="$t('common.repeat')"
+    @click="repeat"
+  >
     <span class="speaker__icon">{{ icon.SPEAKER }}</span>
   </button>
 </template>
@@ -11,6 +17,7 @@ import type { PropType } from 'vue'
 
 import { audio } from '@/services/audio'
 
+import { SPEAKER_POLL_MS } from '@/constants/gameConfig'
 import { ICON } from '@/constants/icons'
 
 export default defineComponent({
@@ -25,10 +32,24 @@ export default defineComponent({
       default: () => []
     }
   },
+  data() {
+    return {
+      isSpeaking: false,
+      pollTimer: null as ReturnType<typeof setInterval> | null
+    }
+  },
   computed: {
     icon() {
       return ICON
     }
+  },
+  mounted() {
+    this.pollTimer = setInterval(() => {
+      this.isSpeaking = audio.isSpeaking()
+    }, SPEAKER_POLL_MS)
+  },
+  beforeUnmount() {
+    if (this.pollTimer) clearInterval(this.pollTimer)
   },
   methods: {
     repeat() {
@@ -53,12 +74,33 @@ export default defineComponent({
   @include flex-center;
   @include touch-target;
   @include pressable;
+  position: relative;
   inline-size: var(--touch-min);
   block-size: var(--touch-min);
   background: var(--color-sun);
 
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-pill);
+    border: 3px solid var(--color-primary);
+    opacity: 0;
+    pointer-events: none;
+  }
+
   &__icon {
     font-size: var(--fs-md);
+  }
+
+  &--speaking {
+    .speaker__icon {
+      @include ambient(pulse, 0.9s);
+    }
+
+    &::after {
+      @include ambient(glow-pulse, 1s);
+    }
   }
 }
 </style>

@@ -93,6 +93,8 @@ export const TRACE_VIEWBOX = 300
 export const MATCH_PAIRS = 4
 export const FLIP_BACK_MS = 900
 
+export const SPEAKER_POLL_MS = 150
+
 export const SPEECH_LANG = 'he-IL'
 export const SPEECH_RATE = 0.75
 export const SPEECH_PITCH = 1.1

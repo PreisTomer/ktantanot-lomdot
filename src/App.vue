@@ -37,7 +37,9 @@
         <span class="app__gate-cta">{{ $t('common.start') }}</span>
       </div>
     </button>
-    <LanguageToggle v-if="!started" class="app__gate-lang" />
+    <div v-if="!started" class="app__gate-lang">
+      <LanguageToggle />
+    </div>
   </div>
 </template>
 
