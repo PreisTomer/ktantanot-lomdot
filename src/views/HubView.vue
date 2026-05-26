@@ -6,7 +6,10 @@
         <h1 class="hub__title">{{ $t('hub.title') }}</h1>
         <p class="hub__subtitle">{{ $t('hub.prompt') }}</p>
       </div>
-      <SpeakerButton :text="$t('hub.prompt')" />
+      <div class="hub__controls">
+        <LanguageToggle />
+        <SpeakerButton :text="$t('hub.prompt')" />
+      </div>
     </header>
     <div class="hub__grid">
       <WorldCard
@@ -24,6 +27,7 @@ import { defineComponent } from 'vue'
 
 import { audio } from '@/services/audio'
 
+import LanguageToggle from '@/components/LanguageToggle.vue'
 import SpeakerButton from '@/components/SpeakerButton.vue'
 import WorldCard from '@/components/WorldCard.vue'
 
@@ -33,7 +37,7 @@ import type { WorldDef } from '@/types/world'
 
 export default defineComponent({
   name: 'HubView',
-  components: { SpeakerButton, WorldCard },
+  components: { LanguageToggle, SpeakerButton, WorldCard },
   computed: {
     worlds(): WorldDef[] {
       return WORLDS
@@ -68,6 +72,12 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: var(--sp-xs);
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-sm);
   }
 
   &__title {

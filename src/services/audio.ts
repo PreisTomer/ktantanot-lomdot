@@ -1,7 +1,11 @@
 // Copyright © 2026 Tomer Preis. Licensed under the MIT License.
 
+import { i18n } from '@/i18n'
+
 import { SPEECH_LANG, SPEECH_PITCH, SPEECH_RATE } from '@/constants/gameConfig'
-import { AUDIO_CLIPS } from '@/constants/audioClips'
+import { AUDIO_CLIPS as CLIPS_HE } from '@/constants/audioClips'
+import { AUDIO_CLIPS as CLIPS_EN } from '@/constants/audioClips.en'
+import { LOCALE } from '@/constants/strings'
 import type { Phrase } from '@/constants/phrases'
 
 type LastRequest = { kind: 'speak'; text: string } | { kind: 'parts'; parts: string[] }
@@ -19,8 +23,15 @@ class AudioService {
   }
 
   private clipUrl(text: string): string | null {
-    const path = AUDIO_CLIPS[text.trim()]
+    const clips = i18n.global.locale === LOCALE.EN ? CLIPS_EN : CLIPS_HE
+    const path = clips[text.trim()]
     return path ? import.meta.env.BASE_URL + path : null
+  }
+
+  // Also gate the Web Speech fallback to the right language, so a missing clip
+  // is at least read in the correct accent rather than Hebrew reading English.
+  private get speechLang(): string {
+    return i18n.global.locale === LOCALE.EN ? 'en-US' : SPEECH_LANG
   }
 
   speak(text: string): void {
@@ -106,7 +117,7 @@ class AudioService {
 
   private enqueue(synth: SpeechSynthesis, text: string): void {
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = SPEECH_LANG
+    utterance.lang = this.speechLang
     utterance.rate = SPEECH_RATE
     utterance.pitch = SPEECH_PITCH
     synth.speak(utterance)

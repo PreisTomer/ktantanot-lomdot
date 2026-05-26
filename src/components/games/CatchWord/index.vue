@@ -35,17 +35,16 @@ import { CATCH_BALLOONS, CATCH_ROUNDS } from '@/constants/gameConfig'
 import { CATCH_WORDS } from '@/constants/words'
 import type { PictureWord } from '@/constants/words'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
+import type { Locale } from '@/constants/strings'
 
 import { BalloonScene } from './balloonScene'
-
-const WORD_POOL = CATCH_WORDS.map((entry) => entry.word)
 
 export default defineComponent({
   name: 'CatchWordGame',
   components: { GameShell },
   data() {
     return {
-      target: CATCH_WORDS[0] as PictureWord,
+      target: { word: '', picture: '' } as PictureWord,
       isAnimating: false,
       recent: [] as string[],
       scene: null as BalloonScene | null,
@@ -56,6 +55,15 @@ export default defineComponent({
     ...mapStores(useProgressStore),
     rounds(): number {
       return CATCH_ROUNDS
+    },
+    locale(): Locale {
+      return this.$i18n.locale as Locale
+    },
+    words(): PictureWord[] {
+      return CATCH_WORDS[this.locale]
+    },
+    wordPool(): string[] {
+      return this.words.map((entry) => entry.word)
     },
     speechParts(): string[] {
       return [this.$t('games.catchWord.instruction'), this.target.word]
@@ -77,14 +85,15 @@ export default defineComponent({
   },
   methods: {
     pickTarget() {
+      const pool = this.wordPool
       const stats = this.progressStore.byProfile[DEFAULT_PROFILE_ID]?.items ?? {}
-      const word = pickNextItem(WORD_POOL, stats, this.rng, this.recent)
+      const word = pickNextItem(pool, stats, this.rng, this.recent)
       this.recent.push(word)
-      if (this.recent.length > WORD_POOL.length - 1) this.recent.shift()
-      this.target = CATCH_WORDS.find((entry) => entry.word === word) ?? CATCH_WORDS[0]
+      if (this.recent.length > pool.length - 1) this.recent.shift()
+      this.target = this.words.find((entry) => entry.word === word) ?? this.words[0]
     },
     roundWords(): string[] {
-      return buildChoices(this.target.word, WORD_POOL, CATCH_BALLOONS, this.rng)
+      return buildChoices(this.target.word, this.wordPool, CATCH_BALLOONS, this.rng)
     },
     nextRound() {
       this.pickTarget()

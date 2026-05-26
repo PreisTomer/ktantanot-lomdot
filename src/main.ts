@@ -7,11 +7,13 @@ import '@fontsource/varela-round'
 import '@fontsource/rubik'
 
 import { router } from '@/router'
-import { i18n } from '@/i18n'
+import { i18n, applyLocale, getStoredLocale } from '@/i18n'
 
 import App from '@/App.vue'
 
 import '@/style.css'
 import '@/styles/_keyframes.scss'
+
+applyLocale(getStoredLocale())
 
 createApp(App).use(createPinia()).use(router).use(i18n).mount('#app')

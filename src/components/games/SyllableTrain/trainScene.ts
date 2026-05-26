@@ -129,7 +129,7 @@ export class TrainScene {
     }
   }
 
-  setWord(card: WordCard): void {
+  setWord(card: WordCard, rtl: boolean): void {
     this.departTween?.kill()
     this.departTween = null
     this.destroySpent()
@@ -157,7 +157,10 @@ export class TrainScene {
 
     letters.forEach((char, index) => {
       const isEmpty = index === card.missingIndex
-      const carX = startX + locoW + gap + (count - 1 - index) * (carW + gap)
+      // Hebrew reads right-to-left, so the first letter sits in the rightmost
+      // car; English reads left-to-right, first letter nearest the engine.
+      const slot = rtl ? count - 1 - index : index
+      const carX = startX + locoW + gap + slot * (carW + gap)
       const { container, bg } = this.buildCar(carW, isEmpty ? null : char, index)
       container.position.set(carX, carTop)
       this.trainLayer.addChild(container)
@@ -167,11 +170,12 @@ export class TrainScene {
       }
     })
 
-    // Slide the new train in from the right (its reading-start side).
+    // Slide the new train in from the reading-start side.
+    const fromX = (rtl ? 1 : -1) * TRAIN_SCENE_W * 0.55
     this.track(
       gsap.fromTo(
         this.trainLayer,
-        { x: TRAIN_SCENE_W * 0.55, alpha: 0 },
+        { x: fromX, alpha: 0 },
         { x: 0, alpha: 1, duration: 0.5, ease: 'power3.out' }
       )
     )

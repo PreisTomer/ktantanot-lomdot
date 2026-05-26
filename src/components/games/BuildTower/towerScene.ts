@@ -73,9 +73,8 @@ export class TowerScene {
     }
     this.app.stage.addChild(sky)
 
-    const sun = new Graphics().circle(TOWER_SCENE_W - 120, 96, 54).fill({ color: SCENE.sun })
-    sun.alpha = 0.85
-    this.app.stage.addChild(sun)
+    this.buildClouds()
+    this.buildSun()
 
     this.app.stage.addChild(
       new Graphics().ellipse(180, GROUND_Y + 30, 320, 120).fill({ color: SCENE.hillFar })
@@ -92,6 +91,62 @@ export class TowerScene {
       .roundRect(TOWER_SCENE_W / 2 - plateW / 2, GROUND_Y - 12, plateW, 22, 8)
       .fill({ color: SCENE.tie })
     this.app.stage.addChild(plate)
+  }
+
+  private buildSun(): void {
+    if (!this.app) return
+    const sun = new Container()
+    const glow = new Graphics().circle(0, 0, 86).fill({ color: SCENE.sun })
+    glow.alpha = 0.22
+    const rays = new Container()
+    for (let i = 0; i < 8; i++) {
+      const ray = new Graphics().roundRect(-5, -80, 10, 30, 5).fill({ color: SCENE.sun })
+      ray.alpha = 0.55
+      ray.rotation = (Math.PI / 4) * i
+      rays.addChild(ray)
+    }
+    const disc = new Graphics().circle(0, 0, 52).fill({ color: SCENE.sun })
+    const shine = new Graphics().circle(-16, -16, 22).fill({ color: lerpColor(SCENE.sun, COLOR.white, 0.6) })
+    shine.alpha = 0.7
+    sun.addChild(glow, rays, disc, shine)
+    sun.position.set(TOWER_SCENE_W - 120, 100)
+    this.app.stage.addChild(sun)
+    if (!prefersReducedMotion()) {
+      this.track(gsap.to(rays, { rotation: Math.PI * 2, duration: 38, repeat: -1, ease: 'none' }))
+      this.track(gsap.to(glow.scale, { x: 1.14, y: 1.14, duration: 2.6, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+    }
+  }
+
+  private buildClouds(): void {
+    if (!this.app) return
+    const specs: [number, number, number][] = [
+      [170, 78, 0.92],
+      [470, 54, 0.72],
+      [640, 150, 0.6]
+    ]
+    for (const [x, y, scale] of specs) {
+      const cloud = this.makeCloud()
+      cloud.position.set(x, y)
+      cloud.scale.set(scale)
+      this.app.stage.addChild(cloud)
+      if (!prefersReducedMotion()) {
+        this.track(gsap.to(cloud, { x: x + 34, duration: 9 + x % 5, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+      }
+    }
+  }
+
+  private makeCloud(): Container {
+    const cloud = new Container()
+    const puffs: [number, number, number][] = [
+      [-34, 8, 26],
+      [0, -8, 34],
+      [32, 6, 24],
+      [-4, 14, 30]
+    ]
+    for (const [px, py, r] of puffs) cloud.addChild(new Graphics().circle(px, py, r).fill({ color: SCENE.white }))
+    cloud.alpha = 0.92
+    cloud.filters = [new DropShadowFilter({ alpha: 0.08, blur: 4 })]
+    return cloud
   }
 
   private makeBlock(value: number, color: string): Container {

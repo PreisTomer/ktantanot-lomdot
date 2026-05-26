@@ -44,18 +44,23 @@ import type { Rng } from '@/utils/rng'
 import { SYLLABLE_ROUNDS } from '@/constants/gameConfig'
 import { SYLLABLE_WORDS } from '@/constants/words'
 import type { WordCard } from '@/constants/words'
-import { DEFAULT_PROFILE_ID } from '@/constants/strings'
+import { DEFAULT_PROFILE_ID, LOCALE } from '@/constants/strings'
+import type { Locale } from '@/constants/strings'
 
 import { TrainScene } from './trainScene'
 
 type SubmitFn = (isCorrect: boolean) => void
+
+function emptyCard(): WordCard {
+  return { word: '', picture: '', missingIndex: 0, options: ['', '', ''] }
+}
 
 export default defineComponent({
   name: 'SyllableTrainGame',
   components: { GameShell },
   data() {
     return {
-      card: SYLLABLE_WORDS[0] as WordCard,
+      card: emptyCard(),
       options: [] as string[],
       wrongValue: null as string | null,
       isAnimating: false,
@@ -68,6 +73,15 @@ export default defineComponent({
     ...mapStores(useProgressStore),
     rounds(): number {
       return SYLLABLE_ROUNDS
+    },
+    locale(): Locale {
+      return this.$i18n.locale as Locale
+    },
+    pool(): WordCard[] {
+      return SYLLABLE_WORDS[this.locale]
+    },
+    rtl(): boolean {
+      return this.locale === LOCALE.HE
     },
     correctLetter(): string {
       return this.card.word[this.card.missingIndex]
@@ -84,7 +98,7 @@ export default defineComponent({
     // reactive, and GSAP tweening the proxies corrupts Pixi and crashes.
     const scene = markRaw(new TrainScene())
     await scene.init(this.$refs.stage as HTMLCanvasElement)
-    scene.setWord(this.card)
+    scene.setWord(this.card, this.rtl)
     this.scene = scene
   },
   beforeUnmount() {
@@ -92,18 +106,19 @@ export default defineComponent({
   },
   methods: {
     pickCard() {
-      const ids = SYLLABLE_WORDS.map((word) => word.word)
+      const pool = this.pool
+      const ids = pool.map((word) => word.word)
       const stats = this.progressStore.byProfile[DEFAULT_PROFILE_ID]?.items ?? {}
       const targetWord = pickNextItem(ids, stats, this.rng, this.recent)
       this.recent.push(targetWord)
       if (this.recent.length > ids.length - 1) this.recent.shift()
-      this.card = SYLLABLE_WORDS.find((word) => word.word === targetWord) ?? SYLLABLE_WORDS[0]
+      this.card = pool.find((word) => word.word === targetWord) ?? pool[0]
       this.options = shuffle(this.card.options, this.rng)
       this.wrongValue = null
     },
     nextRound() {
       this.pickCard()
-      this.scene?.setWord(this.card)
+      this.scene?.setWord(this.card, this.rtl)
     },
     async pick(letter: string, submit: SubmitFn) {
       if (this.isAnimating) return

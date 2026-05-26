@@ -1,0 +1,9 @@
+{
+  "common": {
+    "appName": "Little Learners",
+    "back": "Back home",
+    "repeat": "Say it again",
+    "choosePlayer": "Let's choose who plays",
+    "start": "Let's start"
+  }
+}

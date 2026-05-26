@@ -49,3 +49,10 @@ export const ROUTE = {
 } as const
 
 export type RouteName = (typeof ROUTE)[keyof typeof ROUTE]
+
+export const LOCALE = {
+  HE: 'he',
+  EN: 'en'
+} as const
+
+export type Locale = (typeof LOCALE)[keyof typeof LOCALE]

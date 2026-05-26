@@ -32,17 +32,16 @@ import { DETECTIVE_WORDS } from '@/constants/words'
 import type { PictureWord } from '@/constants/words'
 import { LETTER_NAMES } from '@/constants/letters'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
+import type { Locale } from '@/constants/strings'
 
 import { DetectiveScene } from './detectiveScene'
-
-const INITIALS = availableInitials(DETECTIVE_WORDS, DETECTIVE_OPTIONS)
 
 export default defineComponent({
   name: 'DetectiveGame',
   components: { GameShell },
   data() {
     return {
-      target: INITIALS[0],
+      target: '',
       options: [] as PictureWord[],
       recent: [] as string[],
       scene: null as DetectiveScene | null,
@@ -54,8 +53,17 @@ export default defineComponent({
     rounds(): number {
       return DETECTIVE_ROUNDS
     },
+    locale(): Locale {
+      return this.$i18n.locale as Locale
+    },
+    words(): PictureWord[] {
+      return DETECTIVE_WORDS[this.locale]
+    },
+    initials(): string[] {
+      return availableInitials(this.words, DETECTIVE_OPTIONS)
+    },
     letterName(): string {
-      return LETTER_NAMES[this.target] ?? this.target
+      return LETTER_NAMES[this.locale][this.target] ?? this.target
     },
     speechParts(): string[] {
       return [this.$t('games.soundDetective.instruction'), this.letterName]
@@ -76,10 +84,10 @@ export default defineComponent({
   methods: {
     pickRound() {
       const stats = this.progressStore.byProfile[DEFAULT_PROFILE_ID]?.items ?? {}
-      this.target = pickNextItem(INITIALS, stats, this.rng, this.recent)
+      this.target = pickNextItem(this.initials, stats, this.rng, this.recent)
       this.recent.push(this.target)
-      if (this.recent.length > INITIALS.length - 1) this.recent.shift()
-      this.options = buildSoundOptions(DETECTIVE_WORDS, this.target, DETECTIVE_OPTIONS, this.rng)
+      if (this.recent.length > this.initials.length - 1) this.recent.shift()
+      this.options = buildSoundOptions(this.words, this.target, DETECTIVE_OPTIONS, this.rng)
     },
     nextRound() {
       this.pickRound()

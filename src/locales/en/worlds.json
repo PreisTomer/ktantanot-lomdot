@@ -1,0 +1,8 @@
+{
+  "worlds": {
+    "reading": { "name": "Reading", "prompt": "Let's learn to read" },
+    "math": { "name": "Math", "prompt": "Let's count together" },
+    "memory": { "name": "Memory", "prompt": "Let's train our memory" },
+    "sisters": { "name": "Sisters' Mission", "prompt": "A game for two to play together" }
+  }
+}

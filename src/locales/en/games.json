@@ -1,0 +1,32 @@
+{
+  "games": {
+    "syllableTrain": {
+      "title": "The Letter Train",
+      "prompt": "Which letter is missing?",
+      "instruction": "Which letter is missing so the train can go?"
+    },
+    "catchWord": { "title": "Catch the Word", "prompt": "Catch the word {word}", "instruction": "Catch the word", "cue": "Catch:" },
+    "soundDetective": { "title": "The Detective", "prompt": "Find a word that starts with the letter {letter}", "instruction": "Which word starts with the letter" },
+    "magicBook": { "title": "The Magic Book", "prompt": "Listen to the word and find it", "instruction": "Listen to the word and find it", "find": "Find the word" },
+    "bearRestaurant": { "title": "The Bear's Restaurant", "prompt": "How many cakes are on the plate?", "story": "The bear got {a} cakes and {b} more cakes" },
+    "thiefMonkey": { "title": "The Thief Monkey", "prompt": "How many bananas are left?", "story": "The thief monkey took {stolen} bananas from the tree" },
+    "frogJumps": { "title": "Frog Jumps", "prompt": "Where will the frog land?", "story": "The frog is on {start} and jumps {add} more" },
+    "buildTower": { "title": "Build the Tower", "prompt": "Build the tower from small to big", "instruction": "Put the blocks in order, small to big" },
+    "whatInRoom": { "title": "What Was in the Room?", "study": "Look carefully at what is in the room", "recall": "What disappeared from the room?" },
+    "soundSimon": { "title": "Sound Simon", "prompt": "Listen to the sounds and repeat them" },
+    "whereHidden": { "title": "Where Did It Hide?", "prompt": "Follow the ball, where is it hiding?", "instruction": "Follow the ball" },
+    "completeSequence": { "title": "Finish the Pattern", "prompt": "What comes next in the pattern?", "instruction": "Finish the pattern, what comes next?" },
+    "rememberPath": { "title": "Remember the Path", "prompt": "Follow the rabbit, then walk the path again", "instruction": "Follow the rabbit" },
+    "sistersMission": {
+      "title": "Sisters' Mission",
+      "prompt": "Read the way home, then follow the arrows",
+      "dir": { "up": "up", "down": "down", "left": "left", "right": "right" }
+    },
+    "comingSoon": "This game is almost ready, we'll play it soon!",
+    "soonBadge": "Soon",
+    "finished": "Well done! We finished the whole game!",
+    "playAgain": "Again",
+    "anotherGame": "Another game",
+    "anotherWorld": "Another world"
+  }
+}

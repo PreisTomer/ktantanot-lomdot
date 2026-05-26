@@ -44,19 +44,13 @@ import RewardOverlay from '@/components/RewardOverlay/index.vue'
 
 import { ICON } from '@/constants/icons'
 import { PHRASE } from '@/constants/phrases'
+import type { Phrase, PhraseKey } from '@/constants/phrases'
 import { REWARD_DURATION_MS } from '@/constants/gameConfig'
 import { ROUTE } from '@/constants/strings'
-import type { GameId } from '@/constants/strings'
+import type { GameId, Locale } from '@/constants/strings'
 import { findWorldForGame } from '@/constants/worlds'
 
-const PRAISE = [
-  PHRASE.amazing,
-  PHRASE.wellDone,
-  PHRASE.superStar,
-  PHRASE.brilliant,
-  PHRASE.keepItUp,
-  PHRASE.champion
-]
+const PRAISE_KEYS: PhraseKey[] = ['amazing', 'wellDone', 'superStar', 'brilliant', 'keepItUp', 'champion']
 
 export default defineComponent({
   name: 'GameShell',
@@ -93,6 +87,12 @@ export default defineComponent({
     icon() {
       return ICON
     },
+    phrases(): Record<PhraseKey, Phrase> {
+      return PHRASE[this.$i18n.locale as Locale]
+    },
+    praise(): Phrase[] {
+      return PRAISE_KEYS.map((key) => this.phrases[key])
+    },
     completedRounds(): number {
       return this.isFinished ? this.rounds : this.current - 1
     },
@@ -128,13 +128,13 @@ export default defineComponent({
     submit(isCorrect: boolean) {
       if (this.isBusy || this.isFinished) return
       if (!isCorrect) {
-        audio.playPhrase(PHRASE.almost)
+        audio.playPhrase(this.phrases.almost)
         this.$emit('wrong')
         return
       }
       this.isBusy = true
       this.isShowingReward = true
-      audio.playPhrase(PRAISE[Math.floor(Math.random() * PRAISE.length)])
+      audio.playPhrase(this.praise[Math.floor(Math.random() * this.praise.length)])
       this.rewardTimer = setTimeout(() => this.afterReward(), REWARD_DURATION_MS)
     },
     afterReward() {
@@ -149,7 +149,7 @@ export default defineComponent({
     },
     finish() {
       this.isFinished = true
-      audio.playPhrase(PHRASE.superStar)
+      audio.playPhrase(this.phrases.superStar)
       this.$emit('finished')
     },
     replay() {

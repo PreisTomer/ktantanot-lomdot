@@ -63,18 +63,17 @@ import { MAGIC_ADVANCE_MS, MAGIC_COMPLETE_MS, MAGIC_ROUNDS } from '@/constants/g
 import { MAGIC_STORIES } from '@/constants/stories'
 import type { StoryPage, StoryWord } from '@/constants/stories'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
+import type { Locale } from '@/constants/strings'
 import { ICON } from '@/constants/icons'
 
 type SubmitFn = (isCorrect: boolean) => void
-
-const STORY_IDS = MAGIC_STORIES.map((story) => story.id)
 
 export default defineComponent({
   name: 'MagicBookGame',
   components: { GameShell },
   data() {
     return {
-      page: MAGIC_STORIES[0] as StoryPage,
+      page: { id: '', words: [] } as StoryPage,
       order: [] as number[],
       targetIndex: 0,
       found: [] as string[],
@@ -94,6 +93,15 @@ export default defineComponent({
     },
     rounds(): number {
       return MAGIC_ROUNDS
+    },
+    locale(): Locale {
+      return this.$i18n.locale as Locale
+    },
+    stories(): StoryPage[] {
+      return MAGIC_STORIES[this.locale]
+    },
+    storyIds(): string[] {
+      return this.stories.map((story) => story.id)
     },
     target(): StoryWord {
       return this.page.words[Math.min(this.targetIndex, this.page.words.length - 1)]
@@ -125,10 +133,10 @@ export default defineComponent({
   methods: {
     pickPage() {
       const stats = this.progressStore.byProfile[DEFAULT_PROFILE_ID]?.items ?? {}
-      const id = pickNextItem(STORY_IDS, stats, this.rng, this.recent)
+      const id = pickNextItem(this.storyIds, stats, this.rng, this.recent)
       this.recent.push(id)
-      if (this.recent.length > STORY_IDS.length - 1) this.recent.shift()
-      this.page = MAGIC_STORIES.find((story) => story.id === id) ?? MAGIC_STORIES[0]
+      if (this.recent.length > this.storyIds.length - 1) this.recent.shift()
+      this.page = this.stories.find((story) => story.id === id) ?? this.stories[0]
       this.order = this.scrambleOrder(this.page.words.length)
       this.targetIndex = 0
       this.found = []
@@ -245,72 +253,92 @@ export default defineComponent({
     position: relative;
     inline-size: 100%;
     max-inline-size: 48rem;
-    padding: var(--sp-lg);
+    padding: var(--sp-lg) var(--sp-xl);
+    // Warm parchment pages with a soft sheen at the top edge.
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--color-grape) 22%, white), var(--color-white));
-    border: 4px solid color-mix(in srgb, var(--color-grape) 55%, white);
+      radial-gradient(130% 70% at 50% -8%, color-mix(in srgb, white 65%, transparent), transparent 70%),
+      linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-2) 100%);
+    // Gilded grape cover with a gold inner rim.
+    border: 6px solid color-mix(in srgb, var(--color-grape) 62%, white);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-float), 0 0 40px color-mix(in srgb, var(--color-grape) 30%, transparent);
+    // Page-stack thickness on the outer edges, a float lift, a magical grape
+    // aura, and a thin gold rim hugging the pages.
+    box-shadow:
+      6px 0 0 color-mix(in srgb, var(--color-bg-2) 85%, white),
+      -6px 0 0 color-mix(in srgb, var(--color-bg-2) 85%, white),
+      var(--shadow-float),
+      0 0 54px color-mix(in srgb, var(--color-grape) 42%, transparent),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-sun) 55%, transparent);
 
-    // Central spine.
-    &::after {
+    // Ribbon bookmark peeking over the top edge.
+    &::before {
       content: '';
       position: absolute;
-      inset-block: var(--sp-md);
-      inset-inline-start: 50%;
-      inline-size: 3px;
-      translate: -50% 0;
-      background: color-mix(in srgb, var(--color-grape) 20%, transparent);
+      inset-block-start: -6px;
+      inset-inline-end: 12%;
+      inline-size: 26px;
+      block-size: 54px;
+      background: linear-gradient(180deg, var(--color-coral), var(--color-coral-deep));
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+      box-shadow: var(--shadow-soft);
       pointer-events: none;
     }
   }
 
   &__twinkle {
     position: absolute;
-    inline-size: 16px;
-    block-size: 16px;
+    inline-size: 18px;
+    block-size: 18px;
     background: radial-gradient(circle at 50% 50%, var(--color-white), var(--color-sun) 70%);
     clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
     opacity: var(--op-muted);
     pointer-events: none;
+    z-index: 1;
 
     &--1 {
-      inset-block-start: 10%;
-      inset-inline-start: 8%;
+      inset-block-start: 9%;
+      inset-inline-start: 7%;
       @include ambient(twinkle, 4s);
     }
 
     &--2 {
-      inset-block-start: 16%;
-      inset-inline-end: 10%;
+      inset-block-start: 14%;
+      inset-inline-end: 9%;
       @include ambient(twinkle, 5s);
     }
 
     &--3 {
       inset-block-end: 30%;
-      inset-inline-start: 12%;
+      inset-inline-start: 10%;
       @include ambient(twinkle, 6s);
     }
   }
 
   &__scene {
     @include flex-center;
+    position: relative;
     flex-wrap: wrap;
     gap: var(--sp-md);
-    min-block-size: 9rem;
+    min-block-size: 11rem;
     margin-block-end: var(--sp-md);
+    padding: var(--sp-md);
+    // Framed illustration window inset into the page.
+    background: radial-gradient(120% 100% at 50% 28%, color-mix(in srgb, white 58%, transparent), transparent 76%);
+    border-radius: var(--radius);
+    box-shadow: inset 0 2px 12px color-mix(in srgb, var(--color-ink) 10%, transparent);
   }
 
   &__actor {
     font-size: var(--fs-display);
     line-height: 1;
-    filter: drop-shadow(0 6px 6px color-mix(in srgb, var(--color-ink) 22%, transparent));
+    filter: drop-shadow(0 8px 8px color-mix(in srgb, var(--color-ink) 26%, transparent));
   }
 
   &__hint {
     font-size: var(--fs-hero);
     line-height: 1;
-    opacity: var(--op-ghost);
+    opacity: var(--op-muted);
+    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--color-grape) 60%, transparent));
     @include ambient(float, 5s);
   }
 
@@ -318,29 +346,43 @@ export default defineComponent({
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--sp-sm);
+    gap: var(--sp-md);
     padding-block-start: var(--sp-md);
-    border-block-start: 2px dashed color-mix(in srgb, var(--color-grape) 30%, transparent);
+    // Ruled writing line across the page.
+    border-block-start: 3px solid color-mix(in srgb, var(--color-grape) 22%, transparent);
   }
 
   &__word {
     @include flex-center;
-    @include pressable;
     min-block-size: var(--touch-min);
-    padding: var(--sp-sm) var(--sp-md);
+    padding: var(--sp-sm) var(--sp-lg);
     font-size: var(--fs-lg);
     font-weight: 700;
     color: var(--color-ink);
-    background: var(--color-surface);
-    transition: background var(--tr-fast), color var(--tr-fast), transform var(--tr-fast);
+    // Raised parchment word-card with a warm grape edge.
+    background: linear-gradient(180deg, var(--color-white), var(--color-bg));
+    border: 2px solid color-mix(in srgb, var(--color-grape) 35%, white);
+    border-radius: var(--radius);
+    box-shadow: 0 5px 0 color-mix(in srgb, var(--color-grape) 30%, white), var(--shadow-soft);
+    transition: transform var(--tr-fast), box-shadow var(--tr-fast), background var(--tr-normal),
+      border-color var(--tr-normal);
 
+    &:active {
+      transform: translateY(5px);
+      box-shadow: 0 0 0 color-mix(in srgb, var(--color-grape) 30%, white), var(--shadow-press);
+    }
+
+    // Found: the word lights up gold and glows.
     &--awake {
-      color: var(--color-ink);
-      background: var(--color-sun);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--color-sun) 70%, white), var(--color-sun));
+      border-color: color-mix(in srgb, var(--color-primary-deep) 55%, var(--color-sun));
+      box-shadow:
+        0 5px 0 color-mix(in srgb, var(--color-primary-deep) 40%, white),
+        0 0 24px color-mix(in srgb, var(--color-sun) 70%, transparent);
     }
 
     &:disabled {
-      opacity: var(--op-strong);
+      cursor: default;
     }
   }
 }
