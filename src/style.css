@@ -145,6 +145,9 @@ canvas[class$='__stage'] {
   canvas[class$='__stage'] {
     inline-size: auto !important;
     max-inline-size: 100% !important;
-    max-block-size: calc(100svh - 240px) !important;
+    /* Per-game reserve for header/dots/chips/answers; games with extra chrome
+       (e.g. Sisters' clue chips) raise --stage-reserve so the scene shrinks to
+       keep its in-canvas controls on screen. */
+    max-block-size: calc(100svh - var(--stage-reserve, 240px)) !important;
   }
 }

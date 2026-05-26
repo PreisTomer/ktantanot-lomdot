@@ -182,6 +182,10 @@ export default defineComponent({
   &__dots {
     justify-content: center;
     margin-block-end: var(--sp-lg);
+
+    @media (max-width: 600px) {
+      margin-block-end: var(--sp-sm);
+    }
   }
 
   &__body {

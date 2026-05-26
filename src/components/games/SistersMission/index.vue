@@ -182,6 +182,13 @@ export default defineComponent({
     box-shadow: var(--shadow-soft);
     transition: background var(--tr-fast), opacity var(--tr-fast);
 
+    // Compact on phones so the chip row never crowds out the scene + D-pad.
+    @media (max-width: 600px) {
+      gap: 2px;
+      padding: var(--sp-xs) var(--sp-sm);
+      font-size: var(--fs-sm);
+    }
+
     &--done {
       background: color-mix(in srgb, var(--color-leaf) 45%, var(--color-surface));
       opacity: var(--op-strong);
@@ -189,10 +196,15 @@ export default defineComponent({
 
     &-arrow {
       font-size: var(--fs-lg);
+
+      @media (max-width: 600px) {
+        font-size: var(--fs-md);
+      }
     }
   }
 
   &__stage {
+    --stage-reserve: 380px;
     inline-size: 100%;
     max-inline-size: 48rem;
     block-size: auto;
