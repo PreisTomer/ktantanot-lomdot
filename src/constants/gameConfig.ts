@@ -32,6 +32,8 @@ export const MONKEY_ROUNDS = 6
 export const MONKEY_MAX = 9
 export const MONKEY_SCENE_W = 900
 export const MONKEY_SCENE_H = 560
+export const MONKEY_SCENE_PORTRAIT_W = 640
+export const MONKEY_SCENE_PORTRAIT_H = 860
 
 export const FROG_ROUNDS = 6
 export const FROG_MAX = 10
@@ -42,6 +44,8 @@ export const BEAR_ROUNDS = 6
 export const BEAR_MAX_SUM = 10
 export const BEAR_SCENE_W = 900
 export const BEAR_SCENE_H = 560
+export const BEAR_SCENE_PORTRAIT_W = 640
+export const BEAR_SCENE_PORTRAIT_H = 820
 
 export const COMPLETE_ROUNDS = 7
 export const COMPLETE_OPTIONS = 4
@@ -61,6 +65,8 @@ export const PATH_START_LEN = 2
 export const PATH_STEP_MS = 720
 export const PATH_SCENE_W = 900
 export const PATH_SCENE_H = 560
+export const PATH_SCENE_PORTRAIT_W = 620
+export const PATH_SCENE_PORTRAIT_H = 820
 
 export const SISTERS_ROUNDS = 5
 export const SISTERS_PATH_LEN = 3
@@ -70,6 +76,8 @@ export const TOWER_MAX = 9
 export const TOWER_BLOCKS = 3
 export const TOWER_SCENE_W = 900
 export const TOWER_SCENE_H = 520
+export const TOWER_SCENE_PORTRAIT_W = 620
+export const TOWER_SCENE_PORTRAIT_H = 860
 
 export const ROOM_ROUNDS = 6
 export const ROOM_SHOWN = 4
@@ -77,6 +85,8 @@ export const ROOM_OPTIONS = 3
 export const ROOM_STUDY_MS = 3200
 export const ROOM_SCENE_W = 900
 export const ROOM_SCENE_H = 540
+export const ROOM_SCENE_PORTRAIT_W = 640
+export const ROOM_SCENE_PORTRAIT_H = 760
 
 export const SIMON_ROUNDS = 5
 export const SIMON_PADS = 4
@@ -85,6 +95,8 @@ export const SIMON_FLASH_MS = 440
 export const SIMON_GAP_MS = 640
 export const SIMON_SCENE_W = 900
 export const SIMON_SCENE_H = 540
+export const SIMON_SCENE_PORTRAIT_W = 760
+export const SIMON_SCENE_PORTRAIT_H = 860
 export const REWARD_DURATION_MS = 1500
 export const WRONG_FEEDBACK_MS = 600
 export const COUNT_MAX = 10

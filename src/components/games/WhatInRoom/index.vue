@@ -40,10 +40,21 @@ import { generateRoomRound } from '@/utils/roomMemory'
 import type { RoomRound } from '@/utils/roomMemory'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
+import { pickStageSize, watchStageOrientation } from '@/utils/stageSize'
 
 import { TILE_TONES } from '@/theme/colors'
 
-import { ROOM_OPTIONS, ROOM_ROUNDS, ROOM_SHOWN, ROOM_STUDY_MS, WRONG_FEEDBACK_MS } from '@/constants/gameConfig'
+import {
+  ROOM_OPTIONS,
+  ROOM_ROUNDS,
+  ROOM_SCENE_H,
+  ROOM_SCENE_PORTRAIT_H,
+  ROOM_SCENE_PORTRAIT_W,
+  ROOM_SCENE_W,
+  ROOM_SHOWN,
+  ROOM_STUDY_MS,
+  WRONG_FEEDBACK_MS
+} from '@/constants/gameConfig'
 import { ROOM_ITEMS } from '@/constants/memoryItems'
 import type { RoomItem } from '@/constants/memoryItems'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
@@ -63,6 +74,7 @@ export default defineComponent({
       wrongKey: null as string | null,
       lastMissing: '',
       scene: null as RoomScene | null,
+      stopOrientation: null as (() => void) | null,
       studyTimer: null as ReturnType<typeof setTimeout> | null,
       wrongTimer: null as ReturnType<typeof setTimeout> | null,
       rng: createRng(Date.now()) as Rng
@@ -92,18 +104,34 @@ export default defineComponent({
   async mounted() {
     // markRaw is essential: without it Vue makes the whole Pixi object tree
     // reactive, and GSAP tweening the proxies corrupts Pixi and crashes.
+    const size = this.stageSize()
     const scene = markRaw(new RoomScene())
-    await scene.init(this.$refs.stage as HTMLCanvasElement)
+    await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
     scene.setRound(this.round.shown)
     this.scene = scene
+    this.stopOrientation = watchStageOrientation(this.handleOrientation)
     this.startStudy()
   },
   beforeUnmount() {
     if (this.studyTimer) clearTimeout(this.studyTimer)
     if (this.wrongTimer) clearTimeout(this.wrongTimer)
+    this.stopOrientation?.()
     this.scene?.destroy()
   },
   methods: {
+    stageSize() {
+      return pickStageSize(
+        { width: ROOM_SCENE_W, height: ROOM_SCENE_H },
+        { width: ROOM_SCENE_PORTRAIT_W, height: ROOM_SCENE_PORTRAIT_H }
+      )
+    },
+    handleOrientation() {
+      const next = this.stageSize()
+      this.scene?.resize(next.width, next.height)
+      // Rebuilt room resets the items; restart the study phase cleanly.
+      this.phase = 'study'
+      this.startStudy()
+    },
     pickRound() {
       let next = generateRoomRound(ROOM_ITEMS, ROOM_SHOWN, ROOM_OPTIONS, this.rng)
       let guard = 0

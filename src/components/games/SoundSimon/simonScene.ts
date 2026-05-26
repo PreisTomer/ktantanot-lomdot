@@ -8,7 +8,6 @@ import gsap from 'gsap'
 import { COLOR, SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
 import { prefersReducedMotion } from '@/utils/motion'
-import { SIMON_SCENE_H, SIMON_SCENE_W } from '@/constants/gameConfig'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
 type PadHandler = (pad: number) => void
@@ -40,6 +39,8 @@ export class SimonScene {
   private onPad: PadHandler | null = null
   private ctx: AudioContext | null = null
   private interactive = false
+  private w = 0
+  private h = 0
   private readonly tweens = new Set<Anim>()
 
   private track(anim: Anim): Anim {
@@ -47,12 +48,14 @@ export class SimonScene {
     return anim
   }
 
-  async init(canvas: HTMLCanvasElement): Promise<void> {
+  async init(canvas: HTMLCanvasElement, width: number, height: number): Promise<void> {
+    this.w = width
+    this.h = height
     const app = new Application()
     await app.init({
       canvas,
-      width: SIMON_SCENE_W,
-      height: SIMON_SCENE_H,
+      width,
+      height,
       antialias: true,
       resolution: Math.min(window.devicePixelRatio || 1, 2),
       autoDensity: true,
@@ -64,18 +67,35 @@ export class SimonScene {
     this.buildNotes()
   }
 
+  // Re-lay-out for a new canvas size (device rotation) without tearing down the
+  // Application or its <canvas>.
+  resize(width: number, height: number): void {
+    if (!this.app) return
+    this.w = width
+    this.h = height
+    this.tweens.forEach((anim) => anim.kill())
+    this.tweens.clear()
+    this.app.stage.removeChildren().forEach((child) => child.destroy({ children: true }))
+    this.pads = []
+    this.notes = []
+    this.app.renderer.resize(width, height)
+    this.buildBackdrop()
+    this.buildPads()
+    this.buildNotes()
+  }
+
   private buildBackdrop(): void {
     if (!this.app) return
     const stage = new Graphics()
-    const bandHeight = SIMON_SCENE_H / BANDS
+    const bandHeight = this.h / BANDS
     for (let i = 0; i < BANDS; i++) {
       const color = lerpColor(SCENE.stageTop, SCENE.stageBottom, i / (BANDS - 1))
-      stage.rect(0, i * bandHeight, SIMON_SCENE_W, bandHeight + 1).fill({ color })
+      stage.rect(0, i * bandHeight, this.w, bandHeight + 1).fill({ color })
     }
     this.app.stage.addChild(stage)
 
     // Soft spotlight pooling behind the pad cluster.
-    const spot = new Graphics().ellipse(SIMON_SCENE_W / 2, SIMON_SCENE_H / 2, 420, 320).fill({ color: SCENE.stageGlow })
+    const spot = new Graphics().ellipse(this.w / 2, this.h / 2, 420, 320).fill({ color: SCENE.stageGlow })
     spot.alpha = 0.22
     spot.filters = [new BlurFilter({ strength: 18 })]
     this.app.stage.addChild(spot)
@@ -98,8 +118,8 @@ export class SimonScene {
   }
 
   private resetNote(note: Text, initial: boolean): void {
-    note.x = 60 + Math.random() * (SIMON_SCENE_W - 120)
-    note.y = initial ? Math.random() * SIMON_SCENE_H : SIMON_SCENE_H + 30
+    note.x = 60 + Math.random() * (this.w - 120)
+    note.y = initial ? Math.random() * this.h : this.h + 30
   }
 
   private driftNote(note: Text, index: number): void {
@@ -120,8 +140,8 @@ export class SimonScene {
   private gridCenter(pad: number): { x: number; y: number } {
     const col = pad % 2
     const row = Math.floor(pad / 2)
-    const cx = SIMON_SCENE_W / 2 + (col === 0 ? -1 : 1) * (PAD + GAP) / 2
-    const cy = SIMON_SCENE_H / 2 + (row === 0 ? -1 : 1) * (PAD + GAP) / 2
+    const cx = this.w / 2 + (col === 0 ? -1 : 1) * (PAD + GAP) / 2
+    const cy = this.h / 2 + (row === 0 ? -1 : 1) * (PAD + GAP) / 2
     return { x: cx, y: cy }
   }
 

@@ -7,7 +7,6 @@ import gsap from 'gsap'
 import { COLOR, SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
 import { prefersReducedMotion } from '@/utils/motion'
-import { TOWER_SCENE_H, TOWER_SCENE_W } from '@/constants/gameConfig'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
 type PickHandler = (value: number) => void
@@ -21,7 +20,6 @@ interface BlockSprite {
 const FONT = 'Varela Round, Rubik, sans-serif'
 const BANDS = 12
 const GROUND_H = 60
-const GROUND_Y = TOWER_SCENE_H - GROUND_H
 const BLOCK_W = 124
 const BLOCK_H = 64
 const STACK_GAP = 4
@@ -40,20 +38,29 @@ export class TowerScene {
   private blocks: BlockSprite[] = []
   private placedCount = 0
   private onPick: PickHandler | null = null
+  private currentBlocks: number[] = []
+  private w = 0
+  private h = 0
   private readonly debris: Graphics[] = []
   private readonly tweens = new Set<Anim>()
+
+  private get groundY(): number {
+    return this.h - GROUND_H
+  }
 
   private track(anim: Anim): Anim {
     this.tweens.add(anim)
     return anim
   }
 
-  async init(canvas: HTMLCanvasElement): Promise<void> {
+  async init(canvas: HTMLCanvasElement, width: number, height: number): Promise<void> {
+    this.w = width
+    this.h = height
     const app = new Application()
     await app.init({
       canvas,
-      width: TOWER_SCENE_W,
-      height: TOWER_SCENE_H,
+      width,
+      height,
       antialias: true,
       resolution: Math.min(window.devicePixelRatio || 1, 2),
       autoDensity: true,
@@ -63,32 +70,47 @@ export class TowerScene {
     this.buildBackdrop()
   }
 
+  resize(width: number, height: number): void {
+    if (!this.app || !this.onPick) return
+    this.w = width
+    this.h = height
+    this.tweens.forEach((anim) => anim.kill())
+    this.tweens.clear()
+    this.app.stage.removeChildren().forEach((child) => child.destroy({ children: true }))
+    this.blocks = []
+    this.debris.length = 0
+    this.app.renderer.resize(width, height)
+    this.buildBackdrop()
+    this.setRound(this.currentBlocks, this.onPick)
+  }
+
   private buildBackdrop(): void {
     if (!this.app) return
     const sky = new Graphics()
-    const bandHeight = TOWER_SCENE_H / BANDS
+    const bandHeight = this.h / BANDS
     for (let i = 0; i < BANDS; i++) {
       const color = lerpColor(SCENE.skyTop, SCENE.skyBottom, i / (BANDS - 1))
-      sky.rect(0, i * bandHeight, TOWER_SCENE_W, bandHeight + 1).fill({ color })
+      sky.rect(0, i * bandHeight, this.w, bandHeight + 1).fill({ color })
     }
     this.app.stage.addChild(sky)
 
     this.buildClouds()
     this.buildSun()
 
+    const groundY = this.groundY
     this.app.stage.addChild(
-      new Graphics().ellipse(180, GROUND_Y + 30, 320, 120).fill({ color: SCENE.hillFar })
+      new Graphics().ellipse(this.w * 0.2, groundY + 30, 320, 120).fill({ color: SCENE.hillFar })
     )
     this.app.stage.addChild(
-      new Graphics().ellipse(720, GROUND_Y + 40, 360, 130).fill({ color: SCENE.hillNear })
+      new Graphics().ellipse(this.w * 0.8, groundY + 40, 360, 130).fill({ color: SCENE.hillNear })
     )
     this.app.stage.addChild(
-      new Graphics().rect(0, GROUND_Y, TOWER_SCENE_W, GROUND_H).fill({ color: SCENE.grass })
+      new Graphics().rect(0, groundY, this.w, GROUND_H).fill({ color: SCENE.grass })
     )
 
     const plateW = BLOCK_W + 36
     const plate = new Graphics()
-      .roundRect(TOWER_SCENE_W / 2 - plateW / 2, GROUND_Y - 12, plateW, 22, 8)
+      .roundRect(this.w / 2 - plateW / 2, groundY - 12, plateW, 22, 8)
       .fill({ color: SCENE.tie })
     this.app.stage.addChild(plate)
   }
@@ -109,7 +131,7 @@ export class TowerScene {
     const shine = new Graphics().circle(-16, -16, 22).fill({ color: lerpColor(SCENE.sun, COLOR.white, 0.6) })
     shine.alpha = 0.7
     sun.addChild(glow, rays, disc, shine)
-    sun.position.set(TOWER_SCENE_W - 120, 100)
+    sun.position.set(this.w - 120, 100)
     this.app.stage.addChild(sun)
     if (!prefersReducedMotion()) {
       this.track(gsap.to(rays, { rotation: Math.PI * 2, duration: 38, repeat: -1, ease: 'none' }))
@@ -120,9 +142,9 @@ export class TowerScene {
   private buildClouds(): void {
     if (!this.app) return
     const specs: [number, number, number][] = [
-      [170, 78, 0.92],
-      [470, 54, 0.72],
-      [640, 150, 0.6]
+      [this.w * 0.19, 78, 0.92],
+      [this.w * 0.52, 54, 0.72],
+      [this.w * 0.71, 150, 0.6]
     ]
     for (const [x, y, scale] of specs) {
       const cloud = this.makeCloud()
@@ -192,10 +214,11 @@ export class TowerScene {
     this.tweens.clear()
     this.clearRound()
     this.onPick = onPick
+    this.currentBlocks = blocks
     this.placedCount = 0
 
     const total = blocks.length * BLOCK_W + (blocks.length - 1) * TRAY_GAP
-    const startX = (TOWER_SCENE_W - total) / 2 + BLOCK_W / 2
+    const startX = (this.w - total) / 2 + BLOCK_W / 2
 
     blocks.forEach((value, i) => {
       const container = this.makeBlock(value, PALETTE[i % PALETTE.length])
@@ -235,8 +258,8 @@ export class TowerScene {
       gsap.killTweensOf(block.container)
 
       const slot = this.placedCount++
-      const targetX = TOWER_SCENE_W / 2
-      const targetY = GROUND_Y - BLOCK_H / 2 - slot * (BLOCK_H + STACK_GAP)
+      const targetX = this.w / 2
+      const targetY = this.groundY - BLOCK_H / 2 - slot * (BLOCK_H + STACK_GAP)
       const peakY = Math.min(block.container.y, targetY) - 90
 
       const timeline = gsap.timeline({

@@ -2,6 +2,7 @@
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { inject } from '@vercel/analytics'
 
 import '@fontsource/varela-round'
 import '@fontsource/rubik'
@@ -15,5 +16,7 @@ import '@/style.css'
 import '@/styles/_keyframes.scss'
 
 applyLocale(getStoredLocale())
+
+inject()
 
 createApp(App).use(createPinia()).use(router).use(i18n).mount('#app')

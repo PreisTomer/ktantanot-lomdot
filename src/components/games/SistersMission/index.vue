@@ -36,8 +36,18 @@ import GameShell from '@/components/GameShell.vue'
 import { extendPath } from '@/utils/pathWalk'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
+import { pickStageSize, watchStageOrientation } from '@/utils/stageSize'
 
-import { PATH_COLS, PATH_ROWS, SISTERS_PATH_LEN, SISTERS_ROUNDS } from '@/constants/gameConfig'
+import {
+  PATH_COLS,
+  PATH_ROWS,
+  PATH_SCENE_H,
+  PATH_SCENE_PORTRAIT_H,
+  PATH_SCENE_PORTRAIT_W,
+  PATH_SCENE_W,
+  SISTERS_PATH_LEN,
+  SISTERS_ROUNDS
+} from '@/constants/gameConfig'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { SistersScene } from './sistersScene'
@@ -56,6 +66,7 @@ export default defineComponent({
       inputIndex: 0,
       busy: false,
       scene: null as SistersScene | null,
+      stopOrientation: null as (() => void) | null,
       rng: createRng(Date.now()) as Rng
     }
   },
@@ -72,17 +83,34 @@ export default defineComponent({
     this.dirs = this.buildPath()
   },
   async mounted() {
+    const size = this.stageSize()
     const scene = markRaw(new SistersScene())
-    await scene.init(this.$refs.stage as HTMLCanvasElement)
+    await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
     scene.setHandler(this.handleDir)
     scene.setRound(this.dirs)
     scene.setInteractive(true)
     this.scene = scene
+    this.stopOrientation = watchStageOrientation(this.handleOrientation)
   },
   beforeUnmount() {
+    this.stopOrientation?.()
     this.scene?.destroy()
   },
   methods: {
+    stageSize() {
+      return pickStageSize(
+        { width: PATH_SCENE_W, height: PATH_SCENE_H },
+        { width: PATH_SCENE_PORTRAIT_W, height: PATH_SCENE_PORTRAIT_H }
+      )
+    },
+    handleOrientation() {
+      const next = this.stageSize()
+      this.scene?.resize(next.width, next.height)
+      this.inputIndex = 0
+      this.busy = false
+      this.scene?.setRound(this.dirs)
+      this.scene?.setInteractive(true)
+    },
     buildPath(): number[] {
       let dirs: number[] = []
       for (let i = 0; i < SISTERS_PATH_LEN; i++) {

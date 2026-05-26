@@ -25,8 +25,18 @@ import GameShell from '@/components/GameShell.vue'
 import { extendPath } from '@/utils/pathWalk'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
+import { pickStageSize, watchStageOrientation } from '@/utils/stageSize'
 
-import { PATH_COLS, PATH_ROWS, PATH_START_LEN, REMEMBER_ROUNDS } from '@/constants/gameConfig'
+import {
+  PATH_COLS,
+  PATH_ROWS,
+  PATH_SCENE_H,
+  PATH_SCENE_PORTRAIT_H,
+  PATH_SCENE_PORTRAIT_W,
+  PATH_SCENE_W,
+  PATH_START_LEN,
+  REMEMBER_ROUNDS
+} from '@/constants/gameConfig'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { PathScene } from './pathScene'
@@ -48,6 +58,7 @@ export default defineComponent({
       sequence: [] as number[],
       inputIndex: 0,
       scene: null as PathScene | null,
+      stopOrientation: null as (() => void) | null,
       timers: [] as ReturnType<typeof setTimeout>[],
       rng: createRng(Date.now()) as Rng
     }
@@ -65,17 +76,33 @@ export default defineComponent({
     this.sequence = this.buildStart()
   },
   async mounted() {
+    const size = this.stageSize()
     const scene = markRaw(new PathScene())
-    await scene.init(this.$refs.stage as HTMLCanvasElement)
+    await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
     scene.setHandler(this.handleDir)
     this.scene = scene
+    this.stopOrientation = watchStageOrientation(this.handleOrientation)
     this.timers.push(setTimeout(() => this.showSequence(), FIRST_PLAY_MS))
   },
   beforeUnmount() {
     this.clearTimers()
+    this.stopOrientation?.()
     this.scene?.destroy()
   },
   methods: {
+    stageSize() {
+      return pickStageSize(
+        { width: PATH_SCENE_W, height: PATH_SCENE_H },
+        { width: PATH_SCENE_PORTRAIT_W, height: PATH_SCENE_PORTRAIT_H }
+      )
+    },
+    handleOrientation() {
+      const next = this.stageSize()
+      this.scene?.resize(next.width, next.height)
+      // Rebuilt grid resets the rabbit; replay the current path from the start.
+      this.clearTimers()
+      this.timers.push(setTimeout(() => this.showSequence(), NEXT_PLAY_MS))
+    },
     buildStart(): number[] {
       let dirs: number[] = []
       for (let i = 0; i < PATH_START_LEN; i++) {

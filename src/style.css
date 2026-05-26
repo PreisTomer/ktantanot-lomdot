@@ -124,6 +124,7 @@ button {
 canvas[class$='__stage'] {
   inline-size: 100% !important;
   block-size: auto !important;
+  aspect-ratio: auto !important;
 }
 
 /* Short landscape phones: also bound the stage by height so the header and

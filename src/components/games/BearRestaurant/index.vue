@@ -38,10 +38,18 @@ import OptionTile from '@/components/OptionTile.vue'
 import { generateAddition } from '@/utils/arithmetic'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
+import { pickStageSize } from '@/utils/stageSize'
 
 import { TILE_TONES } from '@/theme/colors'
 
-import { BEAR_MAX_SUM, BEAR_ROUNDS } from '@/constants/gameConfig'
+import {
+  BEAR_MAX_SUM,
+  BEAR_ROUNDS,
+  BEAR_SCENE_H,
+  BEAR_SCENE_PORTRAIT_H,
+  BEAR_SCENE_PORTRAIT_W,
+  BEAR_SCENE_W
+} from '@/constants/gameConfig'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { BearScene } from './bearScene'
@@ -60,6 +68,7 @@ export default defineComponent({
       recent: [] as number[],
       wrongValue: null as string | null,
       scene: null as BearScene | null,
+      mql: null as MediaQueryList | null,
       rng: createRng(Date.now()) as Rng
     }
   },
@@ -82,15 +91,32 @@ export default defineComponent({
     this.pickRound()
   },
   async mounted() {
-    const scene = markRaw(new BearScene())
-    await scene.init(this.$refs.stage as HTMLCanvasElement)
-    scene.setRound(this.a, this.b)
-    this.scene = scene
+    await this.buildScene()
+    this.mql = window.matchMedia('(max-width: 600px) and (orientation: portrait)')
+    this.mql.addEventListener('change', this.handleOrientation)
   },
   beforeUnmount() {
+    this.mql?.removeEventListener('change', this.handleOrientation)
     this.scene?.destroy()
   },
   methods: {
+    stageSize() {
+      return pickStageSize(
+        { width: BEAR_SCENE_W, height: BEAR_SCENE_H },
+        { width: BEAR_SCENE_PORTRAIT_W, height: BEAR_SCENE_PORTRAIT_H }
+      )
+    },
+    async buildScene() {
+      const size = this.stageSize()
+      const scene = markRaw(new BearScene())
+      await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
+      scene.setRound(this.a, this.b)
+      this.scene = scene
+    },
+    handleOrientation() {
+      const size = this.stageSize()
+      this.scene?.resize(size.width, size.height)
+    },
     pickRound() {
       let problem = generateAddition(BEAR_MAX_SUM, this.rng)
       let guard = 0

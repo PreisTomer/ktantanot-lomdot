@@ -12,6 +12,7 @@
     "gen:audio": "tsx scripts/generateAudio.mts"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "canvas-confetti": "^1.9.3",
     "gsap": "^3.15.0",
     "perfect-freehand": "^1.2.2",

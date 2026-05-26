@@ -26,8 +26,17 @@ import { generateTowerRound } from '@/utils/towerOrder'
 import type { TowerRound } from '@/utils/towerOrder'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
+import { pickStageSize, watchStageOrientation } from '@/utils/stageSize'
 
-import { TOWER_BLOCKS, TOWER_MAX, TOWER_ROUNDS } from '@/constants/gameConfig'
+import {
+  TOWER_BLOCKS,
+  TOWER_MAX,
+  TOWER_ROUNDS,
+  TOWER_SCENE_H,
+  TOWER_SCENE_PORTRAIT_H,
+  TOWER_SCENE_PORTRAIT_W,
+  TOWER_SCENE_W
+} from '@/constants/gameConfig'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { TowerScene } from './towerScene'
@@ -42,6 +51,7 @@ export default defineComponent({
       isAnimating: false,
       lastSignature: '',
       scene: null as TowerScene | null,
+      stopOrientation: null as (() => void) | null,
       rng: createRng(Date.now()) as Rng
     }
   },
@@ -60,15 +70,27 @@ export default defineComponent({
   async mounted() {
     // markRaw is essential: without it Vue makes the whole Pixi object tree
     // reactive, and GSAP tweening the proxies corrupts Pixi and crashes.
+    const size = this.stageSize()
     const scene = markRaw(new TowerScene())
-    await scene.init(this.$refs.stage as HTMLCanvasElement)
+    await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
     scene.setRound(this.round.blocks, this.handlePick)
     this.scene = scene
+    this.stopOrientation = watchStageOrientation(() => {
+      const next = this.stageSize()
+      this.scene?.resize(next.width, next.height)
+    })
   },
   beforeUnmount() {
+    this.stopOrientation?.()
     this.scene?.destroy()
   },
   methods: {
+    stageSize() {
+      return pickStageSize(
+        { width: TOWER_SCENE_W, height: TOWER_SCENE_H },
+        { width: TOWER_SCENE_PORTRAIT_W, height: TOWER_SCENE_PORTRAIT_H }
+      )
+    },
     pickRound() {
       let next = generateTowerRound(TOWER_MAX, TOWER_BLOCKS, this.rng)
       let guard = 0

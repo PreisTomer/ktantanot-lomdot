@@ -38,10 +38,18 @@ import OptionTile from '@/components/OptionTile.vue'
 import { generateSubtraction } from '@/utils/arithmetic'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
+import { pickStageSize, watchStageOrientation } from '@/utils/stageSize'
 
 import { TILE_TONES } from '@/theme/colors'
 
-import { MONKEY_MAX, MONKEY_ROUNDS } from '@/constants/gameConfig'
+import {
+  MONKEY_MAX,
+  MONKEY_ROUNDS,
+  MONKEY_SCENE_H,
+  MONKEY_SCENE_PORTRAIT_H,
+  MONKEY_SCENE_PORTRAIT_W,
+  MONKEY_SCENE_W
+} from '@/constants/gameConfig'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { MonkeyScene } from './monkeyScene'
@@ -59,6 +67,7 @@ export default defineComponent({
       options: [] as number[],
       wrongValue: null as string | null,
       scene: null as MonkeyScene | null,
+      stopOrientation: null as (() => void) | null,
       rng: createRng(Date.now()) as Rng
     }
   },
@@ -81,15 +90,27 @@ export default defineComponent({
     this.pickRound()
   },
   async mounted() {
+    const size = this.stageSize()
     const scene = markRaw(new MonkeyScene())
-    await scene.init(this.$refs.stage as HTMLCanvasElement)
+    await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
     scene.setRound(this.total, this.stolen)
     this.scene = scene
+    this.stopOrientation = watchStageOrientation(() => {
+      const next = this.stageSize()
+      this.scene?.resize(next.width, next.height)
+    })
   },
   beforeUnmount() {
+    this.stopOrientation?.()
     this.scene?.destroy()
   },
   methods: {
+    stageSize() {
+      return pickStageSize(
+        { width: MONKEY_SCENE_W, height: MONKEY_SCENE_H },
+        { width: MONKEY_SCENE_PORTRAIT_W, height: MONKEY_SCENE_PORTRAIT_H }
+      )
+    },
     pickRound() {
       // total >= 2, 1 <= stolen < total, so the answer is always between 1 and
       // total-1 (the monkey never takes them all — no "0" answers).

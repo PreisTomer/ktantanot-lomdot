@@ -7,7 +7,7 @@ import gsap from 'gsap'
 import { SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
 import { DIR_DELTA, walkPositions } from '@/utils/pathWalk'
-import { PATH_COLS, PATH_ROWS, PATH_SCENE_H, PATH_SCENE_W } from '@/constants/gameConfig'
+import { PATH_COLS, PATH_ROWS } from '@/constants/gameConfig'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
 type DirHandler = (dir: number) => void
@@ -18,7 +18,6 @@ const SKY_TOP = '#bfe9ff'
 const SKY_BOTTOM = '#e7f7ff'
 const CELL = 84
 const HOP = 30
-const GROUND_Y = PATH_SCENE_H * 0.34
 const ARROW_TRIANGLES: number[][] = [
   [0, -16, 15, 11, -15, 11],
   [0, 16, 15, -11, -15, -11],
@@ -28,6 +27,7 @@ const ARROW_TRIANGLES: number[][] = [
 
 // משימת האחיות scene: a real path home — stone path tiles on grass, trees, and
 // a little house at the destination. The sisters walk the path tile by tile.
+// Layout is driven by the canvas (w, h) so it fills a wide or a tall stage.
 // markRaw in the component; tracked tweens.
 export class SistersScene {
   private app: Application | null = null
@@ -41,20 +41,28 @@ export class SistersScene {
   private row = this.startRow
   private onDir: DirHandler | null = null
   private interactive = false
+  private w = 0
+  private h = 0
 
   private readonly tweens = new Set<Anim>()
+
+  private get groundY(): number {
+    return this.h * 0.34
+  }
 
   private track(anim: Anim): Anim {
     this.tweens.add(anim)
     return anim
   }
 
-  async init(canvas: HTMLCanvasElement): Promise<void> {
+  async init(canvas: HTMLCanvasElement, width: number, height: number): Promise<void> {
+    this.w = width
+    this.h = height
     const app = new Application()
     await app.init({
       canvas,
-      width: PATH_SCENE_W,
-      height: PATH_SCENE_H,
+      width,
+      height,
       antialias: true,
       resolution: Math.min(window.devicePixelRatio || 1, 2),
       autoDensity: true,
@@ -68,23 +76,43 @@ export class SistersScene {
     this.buildPad()
   }
 
+  resize(width: number, height: number): void {
+    if (!this.app) return
+    this.w = width
+    this.h = height
+    this.tweens.forEach((anim) => anim.kill())
+    this.tweens.clear()
+    this.cells.length = 0
+    this.arrows.length = 0
+    this.sisters = null
+    this.house = null
+    this.app.stage.removeChildren().forEach((child) => child.destroy({ children: true }))
+    this.app.renderer.resize(width, height)
+    this.buildScenery()
+    this.buildPathTiles()
+    this.buildHouse()
+    this.buildSisters()
+    this.buildPad()
+  }
+
   private buildScenery(): void {
     if (!this.app) return
+    const groundY = this.groundY
     const sky = new Graphics()
-    const bandHeight = GROUND_Y / BANDS
+    const bandHeight = groundY / BANDS
     for (let i = 0; i < BANDS; i++) {
       const color = lerpColor(SKY_TOP, SKY_BOTTOM, i / (BANDS - 1))
-      sky.rect(0, i * bandHeight, PATH_SCENE_W, bandHeight + 1).fill({ color })
+      sky.rect(0, i * bandHeight, this.w, bandHeight + 1).fill({ color })
     }
-    sky.rect(0, GROUND_Y, PATH_SCENE_W, PATH_SCENE_H - GROUND_Y).fill({ color: SCENE.grass })
-    sky.rect(0, GROUND_Y, PATH_SCENE_W, 10).fill({ color: SCENE.grassDeep, alpha: 0.4 })
+    sky.rect(0, groundY, this.w, this.h - groundY).fill({ color: SCENE.grass })
+    sky.rect(0, groundY, this.w, 10).fill({ color: SCENE.grassDeep, alpha: 0.4 })
     this.app.stage.addChild(sky)
 
     // A few trees for life, flanking the path.
-    for (const tx of [60, PATH_SCENE_W - 60]) {
+    for (const tx of [60, this.w - 60]) {
       const tree = new Text({ text: '🌳', style: { fontFamily: FONT, fontSize: 84 } })
       tree.anchor.set(0.5)
-      tree.position.set(tx, GROUND_Y + 40)
+      tree.position.set(tx, groundY + 40)
       this.app.stage.addChild(tree)
     }
   }
@@ -92,8 +120,8 @@ export class SistersScene {
   private buildPathTiles(): void {
     if (!this.app) return
     const gridW = PATH_COLS * CELL
-    const x0 = (PATH_SCENE_W - gridW) / 2
-    const y0 = GROUND_Y - CELL * 0.4
+    const x0 = (this.w - gridW) / 2
+    const y0 = this.groundY - CELL * 0.4
     const tileTop = lerpColor(SCENE.path, '#ffffff', 0.18)
     const tiles = new Graphics()
     for (let r = 0; r < PATH_ROWS; r++) {
@@ -146,8 +174,8 @@ export class SistersScene {
 
   private buildPad(): void {
     if (!this.app) return
-    const cx = PATH_SCENE_W / 2
-    const cy = PATH_SCENE_H - 88
+    const cx = this.w / 2
+    const cy = this.h - 88
     const offsets: [number, number][] = [
       [0, -62],
       [0, 62],

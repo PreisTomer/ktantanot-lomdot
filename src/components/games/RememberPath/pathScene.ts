@@ -7,7 +7,7 @@ import gsap from 'gsap'
 import { SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
 import { DIR_DELTA } from '@/utils/pathWalk'
-import { PATH_COLS, PATH_ROWS, PATH_SCENE_H, PATH_SCENE_W, PATH_STEP_MS } from '@/constants/gameConfig'
+import { PATH_COLS, PATH_ROWS, PATH_STEP_MS } from '@/constants/gameConfig'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
 type DirHandler = (dir: number) => void
@@ -38,6 +38,8 @@ export class PathScene {
   private row = this.startRow
   private onDir: DirHandler | null = null
   private interactive = false
+  private w = 0
+  private h = 0
 
   private readonly tweens = new Set<Anim>()
   private pathTimeline: Anim | null = null
@@ -47,12 +49,14 @@ export class PathScene {
     return anim
   }
 
-  async init(canvas: HTMLCanvasElement): Promise<void> {
+  async init(canvas: HTMLCanvasElement, width: number, height: number): Promise<void> {
+    this.w = width
+    this.h = height
     const app = new Application()
     await app.init({
       canvas,
-      width: PATH_SCENE_W,
-      height: PATH_SCENE_H,
+      width,
+      height,
       antialias: true,
       resolution: Math.min(window.devicePixelRatio || 1, 2),
       autoDensity: true,
@@ -65,13 +69,33 @@ export class PathScene {
     this.buildPad()
   }
 
+  // Re-lay-out for a new canvas size (device rotation). The component re-shows
+  // the current path afterwards. Returns nothing; the cell grid is rebuilt.
+  resize(width: number, height: number): void {
+    if (!this.app) return
+    this.w = width
+    this.h = height
+    this.tweens.forEach((anim) => anim.kill())
+    this.tweens.clear()
+    this.pathTimeline = null
+    this.cells.length = 0
+    this.arrows.length = 0
+    this.rabbit = null
+    this.app.stage.removeChildren().forEach((child) => child.destroy({ children: true }))
+    this.app.renderer.resize(width, height)
+    this.buildBackdrop()
+    this.buildGrid()
+    this.buildRabbit()
+    this.buildPad()
+  }
+
   private buildBackdrop(): void {
     if (!this.app) return
     const sky = new Graphics()
-    const bandHeight = PATH_SCENE_H / BANDS
+    const bandHeight = this.h / BANDS
     for (let i = 0; i < BANDS; i++) {
       const color = lerpColor(SKY_TOP, SKY_BOTTOM, i / (BANDS - 1))
-      sky.rect(0, i * bandHeight, PATH_SCENE_W, bandHeight + 1).fill({ color })
+      sky.rect(0, i * bandHeight, this.w, bandHeight + 1).fill({ color })
     }
     this.app.stage.addChild(sky)
   }
@@ -80,8 +104,9 @@ export class PathScene {
     if (!this.app) return
     const gridW = PATH_COLS * CELL
     const gridH = PATH_ROWS * CELL
-    const x0 = (PATH_SCENE_W - gridW) / 2
-    const y0 = 44
+    const x0 = (this.w - gridW) / 2
+    const portrait = this.h > this.w
+    const y0 = portrait ? this.h * 0.46 - gridH / 2 : 44
     const boardPad = 26
     const grassLight = lerpColor(SCENE.leaf, '#ffffff', 0.62)
     const stoneTop = lerpColor(SCENE.leaf, '#ffffff', 0.12)
@@ -126,8 +151,8 @@ export class PathScene {
 
   private buildPad(): void {
     if (!this.app) return
-    const cx = PATH_SCENE_W / 2
-    const cy = PATH_SCENE_H - 96
+    const cx = this.w / 2
+    const cy = this.h > this.w ? this.h - 130 : this.h - 96
     const offsets: [number, number][] = [
       [0, -64],
       [0, 64],

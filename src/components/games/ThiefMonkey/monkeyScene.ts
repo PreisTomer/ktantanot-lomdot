@@ -6,7 +6,6 @@ import gsap from 'gsap'
 
 import { SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
-import { MONKEY_SCENE_H, MONKEY_SCENE_W } from '@/constants/gameConfig'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
 
@@ -14,13 +13,11 @@ const FONT = 'Varela Round, Rubik, sans-serif'
 const BANDS = 12
 const PER_ROW = 5
 const BANANA_GAP = 70
-const CANOPY_CX = MONKEY_SCENE_W * 0.4
 const CANOPY_CY = 150
-const MONKEY_X = MONKEY_SCENE_W * 0.78
-const MONKEY_Y = MONKEY_SCENE_H * 0.66
 
 // הקוף הגנב scene: a banana tree, a thief monkey that steals some bananas, and
-// the equation. Same crash-safe rules as the other scenes (markRaw in the
+// the equation. Layout is driven by the canvas (w, h) so it fills a wide or a
+// tall stage. Same crash-safe rules as the other scenes (markRaw in the
 // component, tracked tweens, never destroy inside a GSAP callback).
 export class MonkeyScene {
   private app: Application | null = null
@@ -30,9 +27,23 @@ export class MonkeyScene {
   private equation: Text | null = null
   private cover: Container | null = null
   private coverTween: Anim | null = null
+  private w = 0
+  private h = 0
+  private total = 4
+  private stolen = 1
 
   private readonly tweens = new Set<Anim>()
   private spent: Container[] = []
+
+  private get canopyCx(): number {
+    return this.w * 0.4
+  }
+  private get monkeyX(): number {
+    return this.w * 0.78
+  }
+  private get monkeyY(): number {
+    return this.h * 0.66
+  }
 
   private track(anim: Anim): Anim {
     this.tweens.add(anim)
@@ -51,12 +62,14 @@ export class MonkeyScene {
     this.spent = []
   }
 
-  async init(canvas: HTMLCanvasElement): Promise<void> {
+  async init(canvas: HTMLCanvasElement, width: number, height: number): Promise<void> {
+    this.w = width
+    this.h = height
     const app = new Application()
     await app.init({
       canvas,
-      width: MONKEY_SCENE_W,
-      height: MONKEY_SCENE_H,
+      width,
+      height,
       antialias: true,
       resolution: Math.min(window.devicePixelRatio || 1, 2),
       autoDensity: true,
@@ -68,27 +81,47 @@ export class MonkeyScene {
     this.buildMonkeyAndEquation()
   }
 
+  resize(width: number, height: number): void {
+    if (!this.app) return
+    this.w = width
+    this.h = height
+    this.tweens.forEach((anim) => anim.kill())
+    this.tweens.clear()
+    this.coverTween = null
+    this.app.stage.removeChildren().forEach((child) => child.destroy({ children: true }))
+    this.bananaLayer.removeChildren()
+    this.bananas = []
+    this.spent = []
+    this.monkey = null
+    this.equation = null
+    this.cover = null
+    this.app.renderer.resize(width, height)
+    this.buildBackdrop()
+    this.app.stage.addChild(this.bananaLayer)
+    this.buildMonkeyAndEquation()
+    this.setRound(this.total, this.stolen)
+  }
+
   private buildBackdrop(): void {
     if (!this.app) return
     const sky = new Graphics()
-    const bandHeight = MONKEY_SCENE_H / BANDS
+    const bandHeight = this.h / BANDS
     for (let i = 0; i < BANDS; i++) {
       const color = lerpColor(SCENE.skyTop, SCENE.skyBottom, i / (BANDS - 1))
-      sky.rect(0, i * bandHeight, MONKEY_SCENE_W, bandHeight + 1).fill({ color })
+      sky.rect(0, i * bandHeight, this.w, bandHeight + 1).fill({ color })
     }
     this.app.stage.addChild(sky)
 
-    const ground = new Graphics()
-      .rect(0, MONKEY_SCENE_H - 80, MONKEY_SCENE_W, 80)
-      .fill({ color: SCENE.grass })
+    const ground = new Graphics().rect(0, this.h - 80, this.w, 80).fill({ color: SCENE.grass })
     this.app.stage.addChild(ground)
 
     // Tree: trunk + layered canopy behind the bananas.
+    const cx = this.canopyCx
     const tree = new Container()
-    tree.addChild(new Graphics().roundRect(CANOPY_CX - 22, 150, 44, MONKEY_SCENE_H - 230, 16).fill({ color: SCENE.rail }))
-    tree.addChild(new Graphics().ellipse(CANOPY_CX, CANOPY_CY, 260, 150).fill({ color: SCENE.hillFar }))
-    tree.addChild(new Graphics().ellipse(CANOPY_CX - 120, CANOPY_CY + 20, 130, 100).fill({ color: SCENE.hillNear }))
-    tree.addChild(new Graphics().ellipse(CANOPY_CX + 120, CANOPY_CY + 20, 130, 100).fill({ color: SCENE.hillNear }))
+    tree.addChild(new Graphics().roundRect(cx - 22, 150, 44, this.h - 230, 16).fill({ color: SCENE.rail }))
+    tree.addChild(new Graphics().ellipse(cx, CANOPY_CY, 260, 150).fill({ color: SCENE.hillFar }))
+    tree.addChild(new Graphics().ellipse(cx - 120, CANOPY_CY + 20, 130, 100).fill({ color: SCENE.hillNear }))
+    tree.addChild(new Graphics().ellipse(cx + 120, CANOPY_CY + 20, 130, 100).fill({ color: SCENE.hillNear }))
     this.app.stage.addChild(tree)
   }
 
@@ -96,7 +129,7 @@ export class MonkeyScene {
     if (!this.app) return
     const monkey = new Text({ text: '🐵', style: { fontFamily: FONT, fontSize: 130 } })
     monkey.anchor.set(0.5)
-    monkey.position.set(MONKEY_X, MONKEY_Y)
+    monkey.position.set(this.monkeyX, this.monkeyY)
     monkey.filters = [new DropShadowFilter({ alpha: 0.3, blur: 2 })]
     this.app.stage.addChild(monkey)
     this.monkey = monkey
@@ -106,7 +139,7 @@ export class MonkeyScene {
       style: { fontFamily: FONT, fontSize: 54, fontWeight: '700', fill: SCENE.letterInk }
     })
     equation.anchor.set(0.5)
-    equation.position.set(MONKEY_SCENE_W / 2, MONKEY_SCENE_H - 44)
+    equation.position.set(this.w / 2, this.h - 44)
     this.app.stage.addChild(equation)
     this.equation = equation
 
@@ -119,7 +152,7 @@ export class MonkeyScene {
     const question = new Text({ text: '?', style: { fontFamily: FONT, fontSize: 104, fontWeight: '700', fill: '#ffffff' } })
     question.anchor.set(0.5)
     cover.addChild(question)
-    cover.position.set(CANOPY_CX, CANOPY_CY + 8)
+    cover.position.set(this.canopyCx, CANOPY_CY + 8)
     cover.scale.set(0)
     cover.visible = false
     cover.filters = [new DropShadowFilter({ alpha: 0.25, blur: 3 })]
@@ -134,6 +167,8 @@ export class MonkeyScene {
   }
 
   setRound(total: number, stolen: number): void {
+    this.total = total
+    this.stolen = stolen
     this.destroySpent()
     for (const banana of this.bananas) banana.destroy()
     this.bananas = []
@@ -145,11 +180,12 @@ export class MonkeyScene {
     if (this.equation) this.equation.text = `${total} − ${stolen} = ?`
 
     const rows = Math.ceil(total / PER_ROW)
+    const cx = this.canopyCx
     let index = 0
     for (let r = 0; r < rows; r++) {
       const countInRow = Math.min(PER_ROW, total - r * PER_ROW)
       const rowW = (countInRow - 1) * BANANA_GAP
-      const startX = CANOPY_CX - rowW / 2
+      const startX = cx - rowW / 2
       for (let c = 0; c < countInRow; c++) {
         const banana = this.banana()
         banana.position.set(startX + c * BANANA_GAP, CANOPY_CY - 30 + r * 60)
@@ -188,13 +224,14 @@ export class MonkeyScene {
 
   private steal(stolen: number): void {
     const taken = this.bananas.slice(this.bananas.length - stolen)
+    const monkeyY = this.monkeyY
     if (this.monkey) {
-      this.track(gsap.to(this.monkey, { y: MONKEY_Y - 40, duration: 0.3, yoyo: true, repeat: 1, ease: 'power1.inOut' }))
+      this.track(gsap.to(this.monkey, { y: monkeyY - 40, duration: 0.3, yoyo: true, repeat: 1, ease: 'power1.inOut' }))
     }
     taken.forEach((banana, i) => {
       const tween: Anim = gsap.to(banana, {
-        x: MONKEY_X,
-        y: MONKEY_Y,
+        x: this.monkeyX,
+        y: monkeyY,
         alpha: 0,
         duration: 0.5,
         delay: i * 0.18,

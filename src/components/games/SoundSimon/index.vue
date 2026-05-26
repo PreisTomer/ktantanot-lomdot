@@ -25,8 +25,18 @@ import GameShell from '@/components/GameShell.vue'
 import { appendStep, generateToneSequence } from '@/utils/simonSequence'
 import { createRng } from '@/utils/rng'
 import type { Rng } from '@/utils/rng'
+import { pickStageSize, watchStageOrientation } from '@/utils/stageSize'
 
-import { SIMON_GAP_MS, SIMON_PADS, SIMON_ROUNDS, SIMON_START_LEN } from '@/constants/gameConfig'
+import {
+  SIMON_GAP_MS,
+  SIMON_PADS,
+  SIMON_ROUNDS,
+  SIMON_SCENE_H,
+  SIMON_SCENE_PORTRAIT_H,
+  SIMON_SCENE_PORTRAIT_W,
+  SIMON_SCENE_W,
+  SIMON_START_LEN
+} from '@/constants/gameConfig'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 
 import { SimonScene } from './simonScene'
@@ -47,6 +57,7 @@ export default defineComponent({
       sequence: [] as number[],
       inputIndex: 0,
       scene: null as SimonScene | null,
+      stopOrientation: null as (() => void) | null,
       timers: [] as ReturnType<typeof setTimeout>[],
       rng: createRng(Date.now()) as Rng
     }
@@ -67,17 +78,29 @@ export default defineComponent({
   async mounted() {
     // markRaw is essential: without it Vue makes the whole Pixi object tree
     // reactive, and GSAP tweening the proxies corrupts Pixi and crashes.
+    const size = this.stageSize()
     const scene = markRaw(new SimonScene())
-    await scene.init(this.$refs.stage as HTMLCanvasElement)
+    await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
     scene.setHandler(this.handlePad)
     this.scene = scene
+    this.stopOrientation = watchStageOrientation(() => {
+      const next = this.stageSize()
+      this.scene?.resize(next.width, next.height)
+    })
     this.timers.push(setTimeout(() => this.playSequence(), FIRST_PLAY_MS))
   },
   beforeUnmount() {
     this.clearTimers()
+    this.stopOrientation?.()
     this.scene?.destroy()
   },
   methods: {
+    stageSize() {
+      return pickStageSize(
+        { width: SIMON_SCENE_W, height: SIMON_SCENE_H },
+        { width: SIMON_SCENE_PORTRAIT_W, height: SIMON_SCENE_PORTRAIT_H }
+      )
+    },
     clearTimers() {
       for (const timer of this.timers) clearTimeout(timer)
       this.timers = []

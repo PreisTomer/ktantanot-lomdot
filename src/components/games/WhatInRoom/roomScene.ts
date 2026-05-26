@@ -7,7 +7,6 @@ import gsap from 'gsap'
 import { SCENE } from '@/theme/colors'
 import { lerpColor } from '@/utils/color'
 import { prefersReducedMotion } from '@/utils/motion'
-import { ROOM_SCENE_H, ROOM_SCENE_W } from '@/constants/gameConfig'
 import type { RoomItem } from '@/constants/memoryItems'
 
 type Anim = gsap.core.Tween | gsap.core.Timeline
@@ -22,34 +21,45 @@ interface PlacedItem {
 const FONT = 'Varela Round, Rubik, sans-serif'
 const BANDS = 12
 const FLOOR_H = 120
-const SHELF_Y = ROOM_SCENE_H - FLOOR_H - 70
 const SHELF_THICK = 18
 const ITEM_SIZE = 92
-const MARGIN = 130
 
 // מה היה בחדר scene: objects sit on a shelf in a cosy room; the lights dim, one
-// object vanishes, then the lights come back on a glowing empty gap. Same
-// crash-safe rules as the other scenes (markRaw in the component, tracked
-// tweens; nothing is created-then-destroyed inside a GSAP callback).
+// object vanishes, then the lights come back on a glowing empty gap. Layout is
+// driven by the canvas (w, h) so it fills a wide or a tall stage. Same crash-safe
+// rules as the other scenes (markRaw in the component, tracked tweens; nothing is
+// created-then-destroyed inside a GSAP callback).
 export class RoomScene {
   private app: Application | null = null
   private items: PlacedItem[] = []
   private cover: Graphics | null = null
   private gap: Container | null = null
+  private shown: RoomItem[] = []
+  private w = 0
+  private h = 0
   private readonly slots: number[] = []
   private readonly tweens = new Set<Anim>()
+
+  private get shelfY(): number {
+    return this.h - FLOOR_H - 70
+  }
+  private get margin(): number {
+    return Math.max(70, this.w * 0.14)
+  }
 
   private track(anim: Anim): Anim {
     this.tweens.add(anim)
     return anim
   }
 
-  async init(canvas: HTMLCanvasElement): Promise<void> {
+  async init(canvas: HTMLCanvasElement, width: number, height: number): Promise<void> {
+    this.w = width
+    this.h = height
     const app = new Application()
     await app.init({
       canvas,
-      width: ROOM_SCENE_W,
-      height: ROOM_SCENE_H,
+      width,
+      height,
       antialias: true,
       resolution: Math.min(window.devicePixelRatio || 1, 2),
       autoDensity: true,
@@ -60,39 +70,54 @@ export class RoomScene {
     this.buildCover()
   }
 
+  resize(width: number, height: number): void {
+    if (!this.app) return
+    this.w = width
+    this.h = height
+    this.tweens.forEach((anim) => anim.kill())
+    this.tweens.clear()
+    this.app.stage.removeChildren().forEach((child) => child.destroy({ children: true }))
+    this.items = []
+    this.cover = null
+    this.gap = null
+    this.slots.length = 0
+    this.app.renderer.resize(width, height)
+    this.buildBackdrop()
+    this.buildCover()
+    if (this.shown.length) this.setRound(this.shown)
+  }
+
   private buildBackdrop(): void {
     if (!this.app) return
     const wall = new Graphics()
-    const bandHeight = ROOM_SCENE_H / BANDS
+    const bandHeight = this.h / BANDS
     for (let i = 0; i < BANDS; i++) {
       const color = lerpColor(SCENE.roomTop, SCENE.roomBottom, i / (BANDS - 1))
-      wall.rect(0, i * bandHeight, ROOM_SCENE_W, bandHeight + 1).fill({ color })
+      wall.rect(0, i * bandHeight, this.w, bandHeight + 1).fill({ color })
     }
     this.app.stage.addChild(wall)
 
-    const window = new Graphics()
-      .roundRect(ROOM_SCENE_W - 250, 50, 180, 150, 14)
-      .fill({ color: SCENE.shelfEdge })
-    window.roundRect(ROOM_SCENE_W - 240, 60, 160, 130, 10).fill({ color: SCENE.trainWindow })
-    window.circle(ROOM_SCENE_W - 130, 96, 26).fill({ color: SCENE.sun })
-    this.app.stage.addChild(window)
+    const winW = Math.min(180, this.w * 0.28)
+    const winX = this.w - winW - 70
+    const win = new Graphics().roundRect(winX, 50, winW, 150, 14).fill({ color: SCENE.shelfEdge })
+    win.roundRect(winX + 10, 60, winW - 20, 130, 10).fill({ color: SCENE.trainWindow })
+    win.circle(winX + winW * 0.6, 96, 26).fill({ color: SCENE.sun })
+    this.app.stage.addChild(win)
 
-    this.app.stage.addChild(
-      new Graphics().rect(0, ROOM_SCENE_H - FLOOR_H, ROOM_SCENE_W, FLOOR_H).fill({ color: SCENE.floor })
-    )
+    this.app.stage.addChild(new Graphics().rect(0, this.h - FLOOR_H, this.w, FLOOR_H).fill({ color: SCENE.floor }))
 
-    const span = ROOM_SCENE_W - MARGIN * 2
+    const span = this.w - this.margin * 2
     const shelf = new Graphics()
-      .roundRect(MARGIN - 20, SHELF_Y + ITEM_SIZE / 2, span + 40, SHELF_THICK, 6)
+      .roundRect(this.margin - 20, this.shelfY + ITEM_SIZE / 2, span + 40, SHELF_THICK, 6)
       .fill({ color: SCENE.shelf })
-    shelf.roundRect(MARGIN - 20, SHELF_Y + ITEM_SIZE / 2 + SHELF_THICK - 6, span + 40, 6, 3).fill({ color: SCENE.shelfEdge })
+    shelf.roundRect(this.margin - 20, this.shelfY + ITEM_SIZE / 2 + SHELF_THICK - 6, span + 40, 6, 3).fill({ color: SCENE.shelfEdge })
     shelf.filters = [new DropShadowFilter({ alpha: 0.25, blur: 4 })]
     this.app.stage.addChild(shelf)
   }
 
   private buildCover(): void {
     if (!this.app) return
-    const cover = new Graphics().rect(0, 0, ROOM_SCENE_W, ROOM_SCENE_H).fill({ color: SCENE.cover })
+    const cover = new Graphics().rect(0, 0, this.w, this.h).fill({ color: SCENE.cover })
     cover.alpha = 0
     cover.eventMode = 'none'
     this.app.stage.addChild(cover)
@@ -100,13 +125,14 @@ export class RoomScene {
   }
 
   private slotX(index: number, count: number): number {
-    if (count === 1) return ROOM_SCENE_W / 2
-    const span = ROOM_SCENE_W - MARGIN * 2
-    return MARGIN + (span / (count - 1)) * index
+    if (count === 1) return this.w / 2
+    const span = this.w - this.margin * 2
+    return this.margin + (span / (count - 1)) * index
   }
 
   setRound(shown: RoomItem[]): void {
     if (!this.app) return
+    this.shown = shown
     this.tweens.forEach((anim) => anim.kill())
     this.tweens.clear()
     this.clearItems()
@@ -119,12 +145,12 @@ export class RoomScene {
       this.slots.push(x)
       const text = new Text({ text: item.emoji, style: { fontFamily: FONT, fontSize: ITEM_SIZE } })
       text.anchor.set(0.5)
-      text.position.set(x, SHELF_Y)
+      text.position.set(x, this.shelfY)
       text.filters = [new DropShadowFilter({ alpha: 0.28, blur: 3 })]
       this.app?.stage.addChild(text)
-      this.items.push({ key: item.key, text, x, y: SHELF_Y })
+      this.items.push({ key: item.key, text, x, y: this.shelfY })
       if (!prefersReducedMotion()) {
-        this.track(gsap.to(text, { y: SHELF_Y - 6, duration: 1.8 + i * 0.15, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
+        this.track(gsap.to(text, { y: this.shelfY - 6, duration: 1.8 + i * 0.15, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
       }
     })
   }

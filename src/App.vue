@@ -90,7 +90,7 @@ export default defineComponent({
     padding: var(--sp-lg);
 
     @media (max-width: 600px) {
-      padding: var(--sp-md);
+      padding: var(--sp-sm) var(--sp-xs);
     }
   }
 
