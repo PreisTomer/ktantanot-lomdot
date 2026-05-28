@@ -12,6 +12,7 @@ export const ICON = {
   BALLOON: '🎈',
   DETECTIVE: '🕵️',
   BOOK: '📖',
+  NIQQUD: 'אָ',
   // Math
   BEAR: '🐻',
   MONKEY: '🐵',

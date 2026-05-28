@@ -21,9 +21,11 @@ import CompleteSequenceGame from '@/components/games/CompleteSequence/index.vue'
 import WhereHiddenGame from '@/components/games/WhereHidden/index.vue'
 import RememberPathGame from '@/components/games/RememberPath/index.vue'
 import SistersMissionGame from '@/components/games/SistersMission/index.vue'
+import NiqqudSoundGame from '@/components/games/NiqqudSound/index.vue'
 
 import { GAME_ID, ROUTE } from '@/constants/strings'
-import type { GameId } from '@/constants/strings'
+import type { GameId, Locale } from '@/constants/strings'
+import { isGameAvailableInLocale } from '@/constants/worlds'
 
 interface GameEntry {
   is: Component
@@ -45,7 +47,8 @@ const REGISTRY: Record<GameId, GameEntry> = {
   [GAME_ID.WHERE_HIDDEN]: { is: WhereHiddenGame, props: {} },
   [GAME_ID.COMPLETE_SEQUENCE]: { is: CompleteSequenceGame, props: {} },
   [GAME_ID.REMEMBER_PATH]: { is: RememberPathGame, props: {} },
-  [GAME_ID.SISTERS_MISSION]: { is: SistersMissionGame, props: {} }
+  [GAME_ID.SISTERS_MISSION]: { is: SistersMissionGame, props: {} },
+  [GAME_ID.NIQQUD_SOUND]: { is: NiqqudSoundGame, props: {} }
 }
 
 export default defineComponent({
@@ -63,6 +66,10 @@ export default defineComponent({
   },
   created() {
     if (!this.entry) {
+      this.$router.replace({ name: ROUTE.HUB })
+      return
+    }
+    if (!isGameAvailableInLocale(this.gameId as GameId, this.$i18n.locale as Locale)) {
       this.$router.replace({ name: ROUTE.HUB })
     }
   }

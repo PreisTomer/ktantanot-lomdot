@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <RewardOverlay v-if="isShowingReward" />
+    <RewardOverlay v-if="isShowingReward" :tier="rewardTier" />
   </section>
 </template>
 
@@ -45,9 +45,14 @@ import RewardOverlay from '@/components/RewardOverlay/index.vue'
 import { ICON } from '@/constants/icons'
 import { PHRASE } from '@/constants/phrases'
 import type { Phrase, PhraseKey } from '@/constants/phrases'
-import { REWARD_DURATION_MS } from '@/constants/gameConfig'
-import { ROUTE } from '@/constants/strings'
-import type { GameId, Locale } from '@/constants/strings'
+import {
+  REWARD_DURATION_FINISH_MS,
+  REWARD_DURATION_MS,
+  REWARD_STREAK_BIG,
+  REWARD_STREAK_STANDARD
+} from '@/constants/gameConfig'
+import { REWARD_TIER, ROUTE } from '@/constants/strings'
+import type { GameId, Locale, RewardTier } from '@/constants/strings'
 import { findWorldForGame } from '@/constants/worlds'
 
 const PRAISE_KEYS: PhraseKey[] = ['amazing', 'wellDone', 'superStar', 'brilliant', 'keepItUp', 'champion']
@@ -77,6 +82,8 @@ export default defineComponent({
   data() {
     return {
       current: 1,
+      streak: 0,
+      rewardTier: REWARD_TIER.STANDARD as RewardTier,
       isBusy: false,
       isShowingReward: false,
       isFinished: false,
@@ -128,14 +135,24 @@ export default defineComponent({
     submit(isCorrect: boolean) {
       if (this.isBusy || this.isFinished) return
       if (!isCorrect) {
+        this.streak = 0
         audio.playPhrase(this.phrases.almost)
         this.$emit('wrong')
         return
       }
+      this.streak += 1
       this.isBusy = true
       this.isShowingReward = true
+      this.rewardTier = this.pickTier()
       audio.playPhrase(this.praise[Math.floor(Math.random() * this.praise.length)])
-      this.rewardTimer = setTimeout(() => this.afterReward(), REWARD_DURATION_MS)
+      const duration = this.rewardTier === REWARD_TIER.FINISH ? REWARD_DURATION_FINISH_MS : REWARD_DURATION_MS
+      this.rewardTimer = setTimeout(() => this.afterReward(), duration)
+    },
+    pickTier(): RewardTier {
+      if (this.current >= this.rounds) return REWARD_TIER.FINISH
+      if (this.streak >= REWARD_STREAK_BIG) return REWARD_TIER.BIG
+      if (this.streak < REWARD_STREAK_STANDARD) return REWARD_TIER.SMALL
+      return REWARD_TIER.STANDARD
     },
     afterReward() {
       this.isShowingReward = false
@@ -154,6 +171,7 @@ export default defineComponent({
     },
     replay() {
       this.current = 1
+      this.streak = 0
       this.isFinished = false
       this.$emit('next', this.current)
     },

@@ -119,6 +119,38 @@ export class BalloonScene {
     this.paused = false
   }
 
+  // One-shot opening animation: relocate the just-spawned balloons below the
+  // canvas, then tween them up + fade them in (staggered). Pauses the ticker
+  // for the duration so they don't double-move from the per-frame rise.
+  intro(): Promise<void> {
+    if (this.balloons.length === 0) return Promise.resolve()
+    this.paused = true
+    const targets = this.balloons.map((b) => b.container.y)
+    this.balloons.forEach((b) => {
+      b.container.y = CATCH_SCENE_H + 100
+      b.container.alpha = 0
+    })
+    return new Promise<void>((resolve) => {
+      let done = false
+      const finish = (): void => {
+        if (done) return
+        done = true
+        this.paused = false
+        resolve()
+      }
+      let lastTimeline: gsap.core.Timeline | null = null
+      this.balloons.forEach((b, i) => {
+        const tl = gsap.timeline()
+        tl.to(b.container, { alpha: 1, duration: 0.3, delay: i * 0.1 })
+        tl.to(b.container, { y: targets[i], duration: 0.6, ease: 'power2.out' }, '<')
+        this.track(tl)
+        lastTimeline = tl
+      })
+      if (lastTimeline) (lastTimeline as gsap.core.Timeline).eventCallback('onComplete', finish)
+      setTimeout(finish, 1800)
+    })
+  }
+
   private buildBalloon(word: string, index: number): Balloon {
     const color = CONFETTI_COLORS[index % CONFETTI_COLORS.length]
     const container = new Container()

@@ -82,6 +82,7 @@ export default defineComponent({
     scene.setHandler(this.handleDir)
     this.scene = scene
     this.stopOrientation = watchStageOrientation(this.handleOrientation)
+    await scene.intro()
     this.timers.push(setTimeout(() => this.showSequence(), FIRST_PLAY_MS))
   },
   beforeUnmount() {

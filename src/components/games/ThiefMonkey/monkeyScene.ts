@@ -245,7 +245,35 @@ export class MonkeyScene {
 
   cheer(): void {
     if (!this.monkey) return
-    this.track(gsap.to(this.monkey.scale, { x: 1.18, y: 1.18, duration: 0.25, yoyo: true, repeat: 1, ease: 'power2.out' }))
+    const monkey = this.monkey
+    const baseY = monkey.y
+    this.track(gsap.to(monkey.scale, { x: 1.2, y: 1.2, duration: 0.22, yoyo: true, repeat: 1, ease: 'power2.out' }))
+    this.track(gsap.to(monkey, { y: baseY - 22, duration: 0.22, yoyo: true, repeat: 1, ease: 'sine.out' }))
+  }
+
+  // One-shot opening animation: monkey swings in from off-stage right with a
+  // back-out ease, peeks once, then settles at its working position.
+  intro(): Promise<void> {
+    const monkey = this.monkey
+    if (!monkey) return Promise.resolve()
+    const finalX = this.monkeyX
+    monkey.x = this.w + 100
+    monkey.rotation = 0
+    return new Promise<void>((resolve) => {
+      let done = false
+      const finish = (): void => {
+        if (done) return
+        done = true
+        resolve()
+      }
+      const tl = gsap.timeline({ onComplete: finish })
+      tl.to(monkey, { x: finalX, duration: 0.6, ease: 'back.out(1.6)' })
+      tl.to(monkey, { rotation: -0.18, duration: 0.16, ease: 'sine.out' })
+      tl.to(monkey, { rotation: 0.12, duration: 0.18, ease: 'sine.inOut' })
+      tl.to(monkey, { rotation: 0, duration: 0.14, ease: 'sine.in' })
+      this.track(tl)
+      setTimeout(finish, 1600)
+    })
   }
 
   destroy(): void {

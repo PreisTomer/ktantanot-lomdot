@@ -38,6 +38,8 @@ export class DetectiveScene {
   private readonly particleLayer = new Container()
   private cards: Card[] = []
   private glassLetter: Text | null = null
+  private detective: Text | null = null
+  private glass: Container | null = null
   private onPick: PickHandler | null = null
 
   private readonly tweens = new Set<Anim>()
@@ -94,6 +96,7 @@ export class DetectiveScene {
     detective.anchor.set(0.5)
     detective.position.set(cx - 168, cy + 6)
     this.app.stage.addChild(detective)
+    this.detective = detective
 
     // Magnifying glass: handle, lens fill, glossy ring, and the target letter.
     const glass = new Container()
@@ -110,10 +113,41 @@ export class DetectiveScene {
     glass.filters = [new GlowFilter({ color: 0xffffff, outerStrength: 2, distance: 8 })]
     glass.position.set(cx, cy)
     this.glassLetter = letter
+    this.glass = glass
     this.app.stage.addChild(glass)
     if (!prefersReducedMotion()) {
       this.track(gsap.to(glass.scale, { x: 1.05, y: 1.05, duration: 2.2, repeat: -1, yoyo: true, ease: 'sine.inOut' }))
     }
+  }
+
+  // One-shot opening animation: detective pops up first, then the magnifying
+  // glass scales in beside her with a little wiggle of curiosity.
+  intro(): Promise<void> {
+    const detective = this.detective
+    const glass = this.glass
+    if (!detective || !glass) return Promise.resolve()
+    detective.alpha = 0
+    detective.scale.set(0)
+    glass.alpha = 0
+    glass.scale.set(0)
+    return new Promise<void>((resolve) => {
+      let done = false
+      const finish = (): void => {
+        if (done) return
+        done = true
+        resolve()
+      }
+      const tl = gsap.timeline({ onComplete: finish })
+      tl.to(detective, { alpha: 1, duration: 0.2 })
+      tl.to(detective.scale, { x: 1, y: 1, duration: 0.45, ease: 'back.out(2)' }, '<')
+      tl.to(glass, { alpha: 1, duration: 0.2 }, '+=0.05')
+      tl.to(glass.scale, { x: 1, y: 1, duration: 0.45, ease: 'back.out(2)' }, '<')
+      tl.to(glass, { rotation: -0.18, duration: 0.18, ease: 'sine.out' })
+      tl.to(glass, { rotation: 0.12, duration: 0.18, ease: 'sine.inOut' })
+      tl.to(glass, { rotation: 0, duration: 0.14, ease: 'sine.in' })
+      this.track(tl)
+      setTimeout(finish, 1700)
+    })
   }
 
   setRound(target: string, options: PictureWord[], onPick: PickHandler): void {
@@ -216,6 +250,8 @@ export class DetectiveScene {
     this.cards = []
     this.spent = []
     this.glassLetter = null
+    this.detective = null
+    this.glass = null
     if (this.app) {
       try {
         this.app.destroy(true, { children: true, texture: true })

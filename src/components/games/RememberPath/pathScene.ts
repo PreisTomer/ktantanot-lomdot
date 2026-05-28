@@ -255,7 +255,37 @@ export class PathScene {
 
   celebrate(): void {
     if (!this.rabbit) return
-    this.track(gsap.to(this.rabbit.scale, { x: 1.25, y: 1.25, duration: 0.22, yoyo: true, repeat: 1, ease: 'power2.out' }))
+    const rabbit = this.rabbit
+    const baseY = rabbit.y
+    this.track(gsap.to(rabbit.scale, { x: 1.25, y: 1.25, duration: 0.22, yoyo: true, repeat: 1, ease: 'power2.out' }))
+    this.track(gsap.to(rabbit, { y: baseY - 26, duration: 0.18, yoyo: true, repeat: 1, ease: 'sine.out' }))
+  }
+
+  // One-shot opening animation: rabbit drops from the top edge onto the start
+  // tile with a bounce + squash-stretch.
+  intro(): Promise<void> {
+    const rabbit = this.rabbit
+    if (!rabbit) return Promise.resolve()
+    const startCell = this.cells[this.startRow]?.[this.startCol]
+    if (!startCell) return Promise.resolve()
+    const finalY = startCell.y
+    rabbit.y = -60
+    rabbit.alpha = 1
+    rabbit.scale.set(1)
+    return new Promise<void>((resolve) => {
+      let done = false
+      const finish = (): void => {
+        if (done) return
+        done = true
+        resolve()
+      }
+      const tl = gsap.timeline({ onComplete: finish })
+      tl.to(rabbit, { y: finalY, duration: 0.55, ease: 'bounce.out' })
+      tl.to(rabbit.scale, { x: 1.22, y: 0.82, duration: 0.1, ease: 'sine.out' })
+      tl.to(rabbit.scale, { x: 1, y: 1, duration: 0.18, ease: 'back.out(1.8)' })
+      this.track(tl)
+      setTimeout(finish, 1400)
+    })
   }
 
   destroy(): void {

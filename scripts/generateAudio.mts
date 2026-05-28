@@ -15,11 +15,12 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
-import { LETTER_NAMES } from '../src/constants/letters'
+import { composeLetterPrompt, LETTER_NAMES } from '../src/constants/letters'
 import { PHRASE } from '../src/constants/phrases'
 import { MAGIC_STORIES } from '../src/constants/stories'
 import { CATCH_WORDS, SYLLABLE_WORDS } from '../src/constants/words'
 import { BEAR_MAX_SUM, FROG_MAX, MONKEY_MAX } from '../src/constants/gameConfig'
+import { composeNiqqudPrompt, NIQQUD_LETTERS } from '../src/components/games/NiqqudSound/data'
 
 const execFileAsync = promisify(execFile)
 
@@ -71,6 +72,7 @@ interface GamesLocale {
     completeSequence: { prompt: string; instruction: string }
     rememberPath: { prompt: string; instruction: string }
     sistersMission: { prompt: string; dir: { up: string; down: string; left: string; right: string } }
+    niqqudSound?: { find: string }
   }
 }
 interface WorldsLocale {
@@ -134,7 +136,7 @@ function buildOverrides(code: Locale): Map<string, string> {
     }
   }
   for (let stolen = 1; stolen < MONKEY_MAX; stolen++) {
-    o.set(fill(games.thiefMonkey.story, { stolen }), `הַקּוֹף הַגַּנָּב לָקַח ${countPhrase(stolen, 'בָּנָנָה', 'בָּנָנוֹת')} מֵהָעֵץ`)
+    o.set(fill(games.thiefMonkey.story, { stolen }), `הַקֹּף הַגַּנָּב לָקַח ${countPhrase(stolen, 'בָּנָנָה', 'בָּנָנוֹת')} מֵהָעֵץ`)
   }
   for (let start = 0; start < FROG_MAX; start++) {
     for (let add = 1; start + add <= FROG_MAX; add++) {
@@ -144,6 +146,12 @@ function buildOverrides(code: Locale): Map<string, string> {
       )
     }
   }
+
+  // Hila pauses on every sheva-na in densely-vocalised verb forms (e.g. she
+  // reads לְהִסְתַּכֵּל as "le | his | takel" with audible breaks). Override the
+  // spoken text to an unvocalised form so her built-in pronunciation rules
+  // flow it as one word; the display keeps full niqqud for the child to read.
+  o.set(games.whatInRoom.study, 'להסתכל היטב על מה שיש בחדר')
   return o
 }
 
@@ -166,8 +174,15 @@ function collectStrings(code: Locale): string[] {
   add(games.catchWord.instruction)
   for (const entry of CATCH_WORDS[code]) add(entry.word)
 
+  // Detective speaks the whole prompt as ONE clip per letter — chaining the
+  // instruction + a bare letter-name clip padded silence at the boundary and
+  // made names like לָמֶד sound choppy in isolation. Bare instruction and bare
+  // names stay in the manifest too (used elsewhere / by GameHeader 🔊 buttons).
   add(games.soundDetective.instruction)
-  for (const name of Object.values(LETTER_NAMES[code])) add(name)
+  for (const name of Object.values(LETTER_NAMES[code])) {
+    add(name)
+    add(composeLetterPrompt(games.soundDetective.instruction, name))
+  }
 
   add(games.magicBook.find)
   for (const page of MAGIC_STORIES[code]) {
@@ -210,6 +225,21 @@ function collectStrings(code: Locale): string[] {
 
   add(games.sistersMission.prompt)
   for (const word of Object.values(games.sistersMission.dir)) add(word)
+
+  // Niqqud game: Hebrew-only. Two clip sets per (letter, vowel):
+  //   1) full prompt "מצאו את <syllable>" — the round-opening utterance, one
+  //      pre-rendered clip so there's no silence between the phrase and the
+  //      target sound (chained clips inserted ~200ms of padding).
+  //   2) bare syllable — the 🔊 replay button says just the sound to find,
+  //      not the whole sentence, so a child can hear the target on its own.
+  if (code === 'he' && games.niqqudSound) {
+    for (const entry of NIQQUD_LETTERS) {
+      for (const form of Object.values(entry.forms)) {
+        add(composeNiqqudPrompt(games.niqqudSound.find, form.spoken))
+        add(form.spoken)
+      }
+    }
+  }
 
   return [...out].sort()
 }

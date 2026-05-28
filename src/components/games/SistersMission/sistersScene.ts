@@ -256,6 +256,31 @@ export class SistersScene {
     if (this.house) this.track(gsap.to(this.house, { y: this.house.y - 12, duration: 0.2, yoyo: true, repeat: 1, ease: 'power2.out' }))
   }
 
+  // One-shot opening animation: sisters scale-pop into view with a tiny wave.
+  intro(): Promise<void> {
+    const sisters = this.sisters
+    if (!sisters) return Promise.resolve()
+    sisters.alpha = 0
+    sisters.scale.set(0)
+    sisters.rotation = 0
+    return new Promise<void>((resolve) => {
+      let done = false
+      const finish = (): void => {
+        if (done) return
+        done = true
+        resolve()
+      }
+      const tl = gsap.timeline({ onComplete: finish })
+      tl.to(sisters, { alpha: 1, duration: 0.22 })
+      tl.to(sisters.scale, { x: 1, y: 1, duration: 0.5, ease: 'back.out(2)' }, '<')
+      tl.to(sisters, { rotation: -0.14, duration: 0.16, ease: 'sine.out' })
+      tl.to(sisters, { rotation: 0.1, duration: 0.18, ease: 'sine.inOut' })
+      tl.to(sisters, { rotation: 0, duration: 0.14, ease: 'sine.in' })
+      this.track(tl)
+      setTimeout(finish, 1500)
+    })
+  }
+
   destroy(): void {
     this.tweens.forEach((anim) => anim.kill())
     this.tweens.clear()

@@ -17,7 +17,7 @@
             :label="option"
             :tone="tones[i % tones.length]"
             :shake="option === wrongValue"
-            :disabled="isBusy"
+            :disabled="isBusy || isIntroPlaying"
             @pick="(value: string) => handlePick(value, submit)"
           />
         </div>
@@ -69,6 +69,7 @@ export default defineComponent({
       wrongValue: null as string | null,
       scene: null as BearScene | null,
       mql: null as MediaQueryList | null,
+      isIntroPlaying: true,
       rng: createRng(Date.now()) as Rng
     }
   },
@@ -94,6 +95,9 @@ export default defineComponent({
     await this.buildScene()
     this.mql = window.matchMedia('(max-width: 600px) and (orientation: portrait)')
     this.mql.addEventListener('change', this.handleOrientation)
+    await this.scene?.intro()
+    this.isIntroPlaying = false
+    this.scene?.setRound(this.a, this.b)
   },
   beforeUnmount() {
     this.mql?.removeEventListener('change', this.handleOrientation)
@@ -110,7 +114,8 @@ export default defineComponent({
       const size = this.stageSize()
       const scene = markRaw(new BearScene())
       await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
-      scene.setRound(this.a, this.b)
+      // setRound is deferred to mounted() so the bear's intro animation runs
+      // first; cakes fly in only once the bear has greeted the child.
       this.scene = scene
     },
     handleOrientation() {

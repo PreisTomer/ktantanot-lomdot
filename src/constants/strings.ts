@@ -15,6 +15,7 @@ export const GAME_ID = {
   CATCH_WORD: 'catchWord',
   SOUND_DETECTIVE: 'soundDetective',
   MAGIC_BOOK: 'magicBook',
+  NIQQUD_SOUND: 'niqqudSound',
   // Math
   BEAR_RESTAURANT: 'bearRestaurant',
   THIEF_MONKEY: 'thiefMonkey',
@@ -38,6 +39,15 @@ export const REWARD_TYPE = {
 } as const
 
 export type RewardType = (typeof REWARD_TYPE)[keyof typeof REWARD_TYPE]
+
+export const REWARD_TIER = {
+  SMALL: 'small',
+  STANDARD: 'standard',
+  BIG: 'big',
+  FINISH: 'finish'
+} as const
+
+export type RewardTier = (typeof REWARD_TIER)[keyof typeof REWARD_TIER]
 
 // Single shared player until avatars/profiles are introduced.
 export const DEFAULT_PROFILE_ID = 'guest'

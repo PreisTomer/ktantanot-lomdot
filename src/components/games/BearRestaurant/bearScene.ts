@@ -163,7 +163,39 @@ export class BearScene {
 
   cheer(): void {
     if (!this.bear) return
-    this.track(gsap.to(this.bear.scale, { x: 1.15, y: 1.15, duration: 0.22, yoyo: true, repeat: 1, ease: 'power2.out' }))
+    const bear = this.bear
+    const baseY = bear.y
+    this.track(gsap.to(bear.scale, { x: 1.18, y: 1.18, duration: 0.22, yoyo: true, repeat: 1, ease: 'power2.out' }))
+    this.track(gsap.to(bear, { y: baseY - 18, duration: 0.2, yoyo: true, repeat: 1, ease: 'sine.out' }))
+  }
+
+  // One-shot opening animation: bear pops in from invisible with a back-out
+  // bounce, gives a little head-wiggle "hi", and settles. Resolves when the
+  // wiggle ends so the game can spawn the first round's cakes.
+  intro(): Promise<void> {
+    const bear = this.bear
+    if (!bear) return Promise.resolve()
+    bear.alpha = 0
+    bear.scale.set(0)
+    bear.rotation = 0
+    return new Promise<void>((resolve) => {
+      let done = false
+      const finish = (): void => {
+        if (done) return
+        done = true
+        resolve()
+      }
+      const tl = gsap.timeline({ onComplete: finish })
+      tl.to(bear, { alpha: 1, duration: 0.25 })
+      tl.to(bear.scale, { x: 1, y: 1, duration: 0.55, ease: 'back.out(2)' }, '<')
+      tl.to(bear, { rotation: -0.18, duration: 0.18, ease: 'sine.out' })
+      tl.to(bear, { rotation: 0.14, duration: 0.2, ease: 'sine.inOut' })
+      tl.to(bear, { rotation: 0, duration: 0.16, ease: 'sine.in' })
+      this.track(tl)
+      // Resize-during-intro can kill the tween before onComplete fires, leaving
+      // the awaiter stuck — guarantee resolution after the nominal duration.
+      setTimeout(finish, 1500)
+    })
   }
 
   destroy(): void {

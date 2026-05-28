@@ -25,7 +25,7 @@ type PhraseSet = Record<PhraseKey, Phrase>
 export const PHRASE: Record<Locale, PhraseSet> = {
   he: {
     amazing: { text: 'מְעוּלֶה! פָּשׁוּט מַדְהִים!' },
-    wellDone: { text: 'כׇּל הַכָּבוֹד! עֲבוֹדָה יָפָה!' },
+    wellDone: { text: 'כֹּל הַכָּבוֹד! עֲבוֹדָה יָפָה!' },
     superStar: { text: 'אֵיזֶה יוֹפִי, מַמָּשׁ נִפְלָא!' },
     brilliant: { text: 'מְצוּיָן! בְּדִיּוּק נָכוֹן!' },
     keepItUp: { text: 'יֵשׁ! מַמְשִׁיכִים כָּכָה!' },

@@ -71,7 +71,7 @@ export const CATCH_WORDS: Record<Locale, PictureWord[]> = {
     { word: 'נָמֵר', picture: '🐅' },
     { word: 'סוּס', picture: '🐴' },
     { word: 'פִּיל', picture: '🐘' },
-    { word: 'קוֹף', picture: '🐵' },
+    { word: 'קֹף', picture: '🐵' },
     { word: 'דּוֹב', picture: '🐻' },
     { word: 'פָּרָה', picture: '🐮' },
     { word: 'צְפַרְדֵּעַ', picture: '🐸' },

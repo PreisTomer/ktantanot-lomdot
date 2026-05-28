@@ -8,7 +8,7 @@
     </header>
     <div class="world__games">
       <button
-        v-for="game in world.games"
+        v-for="game in visibleGames"
         :key="game.id"
         class="world__game"
         type="button"
@@ -30,9 +30,9 @@ import { audio } from '@/services/audio'
 import BackButton from '@/components/BackButton.vue'
 import SpeakerButton from '@/components/SpeakerButton.vue'
 
-import { READY_GAMES, WORLDS } from '@/constants/worlds'
+import { isGameAvailableInLocale, READY_GAMES, WORLDS } from '@/constants/worlds'
 import { ROUTE } from '@/constants/strings'
-import type { GameId } from '@/constants/strings'
+import type { GameId, Locale } from '@/constants/strings'
 import type { GameDef, WorldDef } from '@/types/world'
 
 export default defineComponent({
@@ -50,6 +50,11 @@ export default defineComponent({
     },
     accent(): string {
       return this.world ? `var(--color-${this.world.colorToken})` : 'var(--color-primary)'
+    },
+    visibleGames(): GameDef[] {
+      if (!this.world) return []
+      const locale = this.$i18n.locale as Locale
+      return this.world.games.filter((game) => isGameAvailableInLocale(game.id, locale))
     }
   },
   mounted() {

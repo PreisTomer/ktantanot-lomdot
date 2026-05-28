@@ -30,7 +30,7 @@ import type { Rng } from '@/utils/rng'
 import { DETECTIVE_OPTIONS, DETECTIVE_ROUNDS } from '@/constants/gameConfig'
 import { DETECTIVE_WORDS } from '@/constants/words'
 import type { PictureWord } from '@/constants/words'
-import { LETTER_NAMES } from '@/constants/letters'
+import { composeLetterPrompt, LETTER_NAMES } from '@/constants/letters'
 import { DEFAULT_PROFILE_ID } from '@/constants/strings'
 import type { Locale } from '@/constants/strings'
 
@@ -66,7 +66,10 @@ export default defineComponent({
       return LETTER_NAMES[this.locale][this.target] ?? this.target
     },
     speechParts(): string[] {
-      return [this.$t('games.soundDetective.instruction'), this.letterName]
+      // One element so audio service plays a single clip — chaining the
+      // instruction phrase + the bare letter name was inserting silence at the
+      // boundary and making names like לָמֶד sound choppy ("la-med") in isolation.
+      return [composeLetterPrompt(this.$t('games.soundDetective.instruction'), this.letterName)]
     }
   },
   created() {
@@ -75,8 +78,9 @@ export default defineComponent({
   async mounted() {
     const scene = markRaw(new DetectiveScene())
     await scene.init(this.$refs.stage as HTMLCanvasElement)
-    scene.setRound(this.target, this.options, this.handlePick)
     this.scene = scene
+    await scene.intro()
+    scene.setRound(this.target, this.options, this.handlePick)
   },
   beforeUnmount() {
     this.scene?.destroy()

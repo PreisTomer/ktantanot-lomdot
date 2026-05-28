@@ -1,8 +1,8 @@
 // Copyright © 2026 Tomer Preis. Licensed under the MIT License.
 
-import { GAME_ID, WORLD_ID } from '@/constants/strings'
+import { GAME_ID, LOCALE, WORLD_ID } from '@/constants/strings'
 import { ICON } from '@/constants/icons'
-import type { GameId } from '@/constants/strings'
+import type { GameId, Locale } from '@/constants/strings'
 import type { WorldDef } from '@/types/world'
 
 // Games that are fully playable; the rest show a "coming soon" screen.
@@ -11,6 +11,7 @@ export const READY_GAMES: ReadonlySet<GameId> = new Set([
   GAME_ID.CATCH_WORD,
   GAME_ID.SOUND_DETECTIVE,
   GAME_ID.MAGIC_BOOK,
+  GAME_ID.NIQQUD_SOUND,
   GAME_ID.THIEF_MONKEY,
   GAME_ID.FROG_JUMPS,
   GAME_ID.BEAR_RESTAURANT,
@@ -23,6 +24,15 @@ export const READY_GAMES: ReadonlySet<GameId> = new Set([
   GAME_ID.SISTERS_MISSION
 ])
 
+// Games whose content is intrinsically Hebrew (niqqud, Hebrew-specific phonics).
+// These are hidden from the world grid in non-Hebrew locales.
+const LOCALE_ONLY_GAMES: ReadonlySet<GameId> = new Set([GAME_ID.NIQQUD_SOUND])
+
+export function isGameAvailableInLocale(gameId: GameId, locale: Locale): boolean {
+  if (locale === LOCALE.HE) return true
+  return !LOCALE_ONLY_GAMES.has(gameId)
+}
+
 // Array order is DOM order; under RTL the first entry sits on the right,
 // so reading flows right-to-left as required.
 export const WORLDS: WorldDef[] = [
@@ -34,7 +44,8 @@ export const WORLDS: WorldDef[] = [
       { id: GAME_ID.SYLLABLE_TRAIN, icon: ICON.TRAIN },
       { id: GAME_ID.CATCH_WORD, icon: ICON.BALLOON },
       { id: GAME_ID.SOUND_DETECTIVE, icon: ICON.DETECTIVE },
-      { id: GAME_ID.MAGIC_BOOK, icon: ICON.BOOK }
+      { id: GAME_ID.MAGIC_BOOK, icon: ICON.BOOK },
+      { id: GAME_ID.NIQQUD_SOUND, icon: ICON.NIQQUD }
     ]
   },
   {

@@ -87,10 +87,11 @@ export default defineComponent({
     const scene = markRaw(new SistersScene())
     await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
     scene.setHandler(this.handleDir)
-    scene.setRound(this.dirs)
-    scene.setInteractive(true)
     this.scene = scene
     this.stopOrientation = watchStageOrientation(this.handleOrientation)
+    await scene.intro()
+    scene.setRound(this.dirs)
+    scene.setInteractive(true)
   },
   beforeUnmount() {
     this.stopOrientation?.()

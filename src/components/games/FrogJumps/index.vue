@@ -63,8 +63,9 @@ export default defineComponent({
   async mounted() {
     const scene = markRaw(new FrogScene())
     await scene.init(this.$refs.stage as HTMLCanvasElement)
-    scene.setRound(this.start, this.add, this.handlePick)
     this.scene = scene
+    await scene.intro()
+    scene.setRound(this.start, this.add, this.handlePick)
   },
   beforeUnmount() {
     this.scene?.destroy()

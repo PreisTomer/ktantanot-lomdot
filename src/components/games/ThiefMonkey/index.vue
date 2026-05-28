@@ -17,7 +17,7 @@
             :label="option"
             :tone="tones[i % tones.length]"
             :shake="option === wrongValue"
-            :disabled="isBusy"
+            :disabled="isBusy || isIntroPlaying"
             @pick="(value: string) => handlePick(value, submit)"
           />
         </div>
@@ -68,6 +68,7 @@ export default defineComponent({
       wrongValue: null as string | null,
       scene: null as MonkeyScene | null,
       stopOrientation: null as (() => void) | null,
+      isIntroPlaying: true,
       rng: createRng(Date.now()) as Rng
     }
   },
@@ -93,12 +94,14 @@ export default defineComponent({
     const size = this.stageSize()
     const scene = markRaw(new MonkeyScene())
     await scene.init(this.$refs.stage as HTMLCanvasElement, size.width, size.height)
-    scene.setRound(this.total, this.stolen)
     this.scene = scene
     this.stopOrientation = watchStageOrientation(() => {
       const next = this.stageSize()
       this.scene?.resize(next.width, next.height)
     })
+    await this.scene?.intro()
+    this.isIntroPlaying = false
+    this.scene?.setRound(this.total, this.stolen)
   },
   beforeUnmount() {
     this.stopOrientation?.()

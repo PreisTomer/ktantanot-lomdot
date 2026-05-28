@@ -148,7 +148,34 @@ export class FrogScene {
 
   cheer(): void {
     if (!this.frog) return
-    this.track(gsap.to(this.frog.scale, { x: 1.2, y: 1.2, duration: 0.2, yoyo: true, repeat: 1, ease: 'power2.out' }))
+    const frog = this.frog
+    const baseY = frog.y
+    this.track(gsap.to(frog.scale, { x: 1.22, y: 1.22, duration: 0.2, yoyo: true, repeat: 1, ease: 'power2.out' }))
+    this.track(gsap.to(frog, { y: baseY - 28, duration: 0.2, yoyo: true, repeat: 1, ease: 'sine.out' }))
+  }
+
+  // One-shot opening animation: frog drops in from above with a bounce, squashes
+  // and stretches on landing. Resolves so the game can wire the pick handler.
+  intro(): Promise<void> {
+    const frog = this.frog
+    if (!frog) return Promise.resolve()
+    const finalY = FROG_Y
+    frog.y = -60
+    frog.scale.set(1)
+    return new Promise<void>((resolve) => {
+      let done = false
+      const finish = (): void => {
+        if (done) return
+        done = true
+        resolve()
+      }
+      const tl = gsap.timeline({ onComplete: finish })
+      tl.to(frog, { y: finalY, duration: 0.55, ease: 'bounce.out' })
+      tl.to(frog.scale, { x: 1.22, y: 0.82, duration: 0.1, ease: 'sine.out' })
+      tl.to(frog.scale, { x: 1, y: 1, duration: 0.18, ease: 'back.out(1.8)' })
+      this.track(tl)
+      setTimeout(finish, 1400)
+    })
   }
 
   destroy(): void {

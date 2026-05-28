@@ -79,6 +79,7 @@ export default defineComponent({
     await scene.init(this.$refs.stage as HTMLCanvasElement)
     scene.setRound(this.roundWords(), this.handleTap)
     this.scene = scene
+    await scene.intro()
   },
   beforeUnmount() {
     this.scene?.destroy()

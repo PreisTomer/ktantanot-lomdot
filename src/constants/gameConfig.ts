@@ -102,7 +102,14 @@ export const SIMON_SCENE_H = 540
 export const SIMON_SCENE_PORTRAIT_W = 760
 export const SIMON_SCENE_PORTRAIT_H = 860
 export const REWARD_DURATION_MS = 1500
+export const REWARD_DURATION_FINISH_MS = 2200
 export const WRONG_FEEDBACK_MS = 600
+
+// Streak tier thresholds. Within a session, consecutive correct answers raise
+// the reward intensity: small → standard → big. The final-round reward always
+// uses the 'finish' tier regardless of streak.
+export const REWARD_STREAK_STANDARD = 3
+export const REWARD_STREAK_BIG = 5
 export const COUNT_MAX = 10
 export const TRACE_ROUNDS = 4
 export const TRACE_VIEWBOX = 300
