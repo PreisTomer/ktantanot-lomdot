@@ -17,3 +17,4 @@ pnpm-debug.log*
 
 # Vite / PWA
 dev-dist/
+.gitnexus

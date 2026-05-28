@@ -35,7 +35,7 @@ export default defineComponent({
   data() {
     return {
       options: [
-        { code: LOCALE.HE, short: 'עב', label: 'עברית' },
+        { code: LOCALE.HE, short: 'עב', label: 'עִבְרִית' },
         { code: LOCALE.EN, short: 'EN', label: 'English' }
       ] as LangOption[]
     }

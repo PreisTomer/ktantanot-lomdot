@@ -171,7 +171,7 @@ export class CupScene {
     // Lift the start cup, drop the ball under it with a bounce, hold, cover.
     timeline.to(introCup.container, { y: BASE_Y - LIFT, duration: 0.45, ease: 'back.out(1.5)' })
     if (this.ball) {
-      timeline.fromTo(this.ball, { y: -120, alpha: 1 }, { y: 0, duration: 0.5, ease: 'bounce.out' }, '<0.15')
+      timeline.fromTo(this.ball, { y: BASE_Y - 120, alpha: 1 }, { y: BASE_Y, duration: 0.5, ease: 'bounce.out' }, '<0.15')
     }
     timeline.to({}, { duration: 0.9 }) // hold so the child registers the spot
     if (this.ball) timeline.to(this.ball, { alpha: 0, duration: 0.12 })
@@ -215,7 +215,7 @@ export class CupScene {
       this.app?.stage.addChild(this.ball) // ensure the ball is visible above the table
       this.ball.position.set(this.slotX[slot], BASE_Y)
       this.ball.alpha = 1
-      this.track(gsap.fromTo(this.ball, { y: 0 }, { y: -22, duration: 0.35, yoyo: true, repeat: 1, ease: 'sine.out' }))
+      this.track(gsap.fromTo(this.ball, { y: BASE_Y }, { y: BASE_Y - 22, duration: 0.35, yoyo: true, repeat: 1, ease: 'sine.out' }))
       this.sparkle(this.slotX[slot], BASE_Y - 18)
     }
   }

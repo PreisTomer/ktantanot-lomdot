@@ -23,57 +23,57 @@ export const MAGIC_STORIES: Record<Locale, StoryPage[]> = {
     {
       id: 'cat-home',
       words: [
-        { text: 'החתול', picture: '🐱', action: 'hop' },
-        { text: 'רץ', picture: '🏃', action: 'run' },
-        { text: 'הביתה', picture: '🏠', action: 'grow' }
+        { text: 'הַחָתוּל', picture: '🐱', action: 'hop' },
+        { text: 'רָץ', picture: '🏃', action: 'run' },
+        { text: 'הַבַּיְתָה', picture: '🏠', action: 'grow' }
       ]
     },
     {
       id: 'dog-bone',
       words: [
-        { text: 'הכלב', picture: '🐶', action: 'hop' },
-        { text: 'אוכל', picture: '😋', action: 'wiggle' },
-        { text: 'עצם', picture: '🦴', action: 'grow' }
+        { text: 'הַכֶּלֶב', picture: '🐶', action: 'hop' },
+        { text: 'אוֹכֵל', picture: '😋', action: 'wiggle' },
+        { text: 'עֶצֶם', picture: '🦴', action: 'grow' }
       ]
     },
     {
       id: 'bird-high',
       words: [
-        { text: 'הציפור', picture: '🐦', action: 'fly' },
-        { text: 'עפה', picture: '💨', action: 'fly' },
-        { text: 'גבוה', picture: '☁️', action: 'rise' }
+        { text: 'הַצִּיפּוֹר', picture: '🐦', action: 'fly' },
+        { text: 'עָפָה', picture: '💨', action: 'fly' },
+        { text: 'גָּבוֹהַ', picture: '☁️', action: 'rise' }
       ]
     },
     {
       id: 'fish-water',
       words: [
-        { text: 'הדג', picture: '🐟', action: 'wiggle' },
-        { text: 'שוחה', picture: '🌊', action: 'run' },
-        { text: 'במים', picture: '💧', action: 'grow' }
+        { text: 'הַדָּג', picture: '🐟', action: 'wiggle' },
+        { text: 'שׂוֹחֶה', picture: '🌊', action: 'run' },
+        { text: 'בַּמַּיִם', picture: '💧', action: 'grow' }
       ]
     },
     {
       id: 'sun-shine',
       words: [
-        { text: 'השמש', picture: '☀️', action: 'spin' },
-        { text: 'זורחת', picture: '🌟', action: 'grow' },
-        { text: 'במרום', picture: '☁️', action: 'rise' }
+        { text: 'הַשֶּׁמֶשׁ', picture: '☀️', action: 'spin' },
+        { text: 'זוֹרַחַת', picture: '🌟', action: 'grow' },
+        { text: 'בַּמָּרוֹם', picture: '☁️', action: 'rise' }
       ]
     },
     {
       id: 'girl-dance',
       words: [
-        { text: 'הילדה', picture: '🧒', action: 'hop' },
-        { text: 'רוקדת', picture: '💃', action: 'spin' },
-        { text: 'בשמחה', picture: '🎉', action: 'grow' }
+        { text: 'הַיַּלְדָּה', picture: '🧒', action: 'hop' },
+        { text: 'רוֹקֶדֶת', picture: '💃', action: 'spin' },
+        { text: 'בְּשִׂמְחָה', picture: '🎉', action: 'grow' }
       ]
     },
     {
       id: 'cow-grass',
       words: [
-        { text: 'הפרה', picture: '🐮', action: 'hop' },
-        { text: 'אוכלת', picture: '😋', action: 'wiggle' },
-        { text: 'עשב', picture: '🌿', action: 'grow' }
+        { text: 'הַפָּרָה', picture: '🐮', action: 'hop' },
+        { text: 'אוֹכֶלֶת', picture: '😋', action: 'wiggle' },
+        { text: 'עֵשֶׂב', picture: '🌿', action: 'grow' }
       ]
     }
   ],

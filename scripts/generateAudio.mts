@@ -99,9 +99,10 @@ function countPhrase(n: number, singular: string, plural: string): string {
   return n === 1 ? `${singular} אַחַת` : `${FEM_BEFORE_NOUN[n]} ${plural}`
 }
 
-// Maps displayed string -> spoken string, to fix Hebrew pronunciation (homograph
-// niqqud, spelled-out numbers) without changing what the app shows or how clips
-// are keyed. English needs no overrides (its neural voice reads digits cleanly).
+// Maps displayed string -> spoken string. Display strings already carry niqqud
+// so the voice reads them correctly; the overrides here only handle templates
+// where the displayed text contains a raw numeral, replacing it with a spoken
+// feminine cardinal that agrees with the counted noun.
 function buildOverrides(code: Locale): Map<string, string> {
   const o = new Map<string, string>()
   const games = loadLocale<GamesLocale>(code, 'games').games
@@ -124,37 +125,22 @@ function buildOverrides(code: Locale): Map<string, string> {
     return o
   }
 
-  const worlds = loadLocale<WorldsLocale>(code, 'worlds').worlds
-  const hub = loadLocale<HubLocale>(code, 'hub').hub
-
-  o.set(worlds.memory.prompt, 'בואו נְאַמֵּן את הזיכרון')
-  o.set(hub.prompt, 'בואו נבחר מִשְׂחָק ונלמד ביחד')
-  o.set(games.comingSoon, 'הַמִּשְׂחָק הזה כמעט מוכן, בקרוב נשחק בו!')
-
-  // Words the voice mis-reads without vowel points.
-  o.set('מעולה! פשוט מדהים!', 'מְעוּלֶה! פשוט מדהים!')
-  o.set('הפרה', 'הַפָּרָה')
-  o.set('עשב', 'עֵשֶׂב')
-  o.set('גזר', 'גֶּזֶר')
-  o.set('במרום', 'בַּמָּרוֹם')
-  o.set(games.sistersMission.prompt, 'קִרְאוּ את הדרך הביתה, ולכו לפי החצים')
-
   for (let a = 1; a <= BEAR_MAX_SUM; a++) {
     for (let b = 1; a + b <= BEAR_MAX_SUM; b++) {
       o.set(
         fill(games.bearRestaurant.story, { a, b }),
-        `הדוב קיבל ${countPhrase(a, 'עוגה', 'עוגות')} ועוד ${countPhrase(b, 'עוגה', 'עוגות')}`
+        `הַדּוֹב קִיבֵּל ${countPhrase(a, 'עוּגָה', 'עוּגוֹת')} וְעוֹד ${countPhrase(b, 'עוּגָה', 'עוּגוֹת')}`
       )
     }
   }
   for (let stolen = 1; stolen < MONKEY_MAX; stolen++) {
-    o.set(fill(games.thiefMonkey.story, { stolen }), `הקוף הגנב לקח ${countPhrase(stolen, 'בננה', 'בננות')} מהעץ`)
+    o.set(fill(games.thiefMonkey.story, { stolen }), `הַקּוֹף הַגַּנָּב לָקַח ${countPhrase(stolen, 'בָּנָנָה', 'בָּנָנוֹת')} מֵהָעֵץ`)
   }
   for (let start = 0; start < FROG_MAX; start++) {
     for (let add = 1; start + add <= FROG_MAX; add++) {
       o.set(
         fill(games.frogJumps.story, { start, add }),
-        `הצפרדע על ${FEM_STANDALONE[start]} וקופצת עוד ${FEM_STANDALONE[add]}`
+        `הַצְּפַרְדֵּעַ עַל ${FEM_STANDALONE[start]} וְקוֹפֶצֶת עוֹד ${FEM_STANDALONE[add]}`
       )
     }
   }

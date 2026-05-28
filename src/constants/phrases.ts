@@ -24,15 +24,15 @@ type PhraseSet = Record<PhraseKey, Phrase>
 // (Hebrew avoids gendered second-person verbs; English uses inclusive "we").
 export const PHRASE: Record<Locale, PhraseSet> = {
   he: {
-    amazing: { text: 'מעולה! פשוט מדהים!' },
-    wellDone: { text: 'כל הכבוד! עבודה יפה!' },
-    superStar: { text: 'איזה כוכב גדול!' },
-    brilliant: { text: 'מצוין! בדיוק נכון!' },
-    keepItUp: { text: 'יש! ממשיכים ככה!' },
-    champion: { text: 'אלופים! איזה כיף!' },
-    almost: { text: 'כמעט! ננסה שוב' },
-    tryAgain: { text: 'עוד פעם, ביחד נצליח!' },
-    comingSoon: { text: 'עוד רגע, בקרוב נשחק בזה!' }
+    amazing: { text: 'מְעוּלֶה! פָּשׁוּט מַדְהִים!' },
+    wellDone: { text: 'כׇּל הַכָּבוֹד! עֲבוֹדָה יָפָה!' },
+    superStar: { text: 'אֵיזֶה יוֹפִי, מַמָּשׁ נִפְלָא!' },
+    brilliant: { text: 'מְצוּיָן! בְּדִיּוּק נָכוֹן!' },
+    keepItUp: { text: 'יֵשׁ! מַמְשִׁיכִים כָּכָה!' },
+    champion: { text: 'אַלּוּפִים! אֵיזֶה כֵּיף!' },
+    almost: { text: 'כִּמְעַט! נְנַסֶּה שׁוּב' },
+    tryAgain: { text: 'עוֹד פַּעַם, בְּיַחַד נַצְלִיחַ!' },
+    comingSoon: { text: 'עוֹד רֶגַע, בְּקָרוֹב נְשַׂחֵק בְּזֶה!' }
   },
   en: {
     amazing: { text: 'Wow! That was amazing!' },

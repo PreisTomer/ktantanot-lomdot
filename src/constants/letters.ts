@@ -8,7 +8,7 @@ import type { Locale } from '@/constants/strings'
 // values are phonetic spellings that steer the neural voice to the letter name.
 export const LETTER_NAMES: Record<Locale, Record<string, string>> = {
   he: {
-    א: 'אָלֶף', ב: 'בֵּית', ג: 'גִימֶל', ד: 'דָלֶת', ה: 'הֵא', ו: 'וָו',
+    א: 'אָלֶף', ב: 'בֵּית', ג: 'גִּימֶל', ד: 'דָּלֶת', ה: 'הֵא', ו: 'וָו',
     ז: 'זַיִן', ח: 'חֵית', ט: 'טֵית', י: 'יוֹד', כ: 'כָּף', ל: 'לָמֶד',
     מ: 'מֵם', נ: 'נוּן', ס: 'סָמֶךְ', ע: 'עַיִן', פ: 'פֵּא', צ: 'צָדִי',
     ק: 'קוֹף', ר: 'רֵישׁ', ש: 'שִׁין', ת: 'תָּו'
